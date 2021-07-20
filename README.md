@@ -21,7 +21,7 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
 
 
 # Authors
-Riley Adams - adam6070@mylaurier.ca
+Riley Adams - adam6070@mylaurier.ca\n
 Torin Borton-McCallum - bort4620@mylaurier.ca
 
 # Credits
