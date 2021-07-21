@@ -1,7 +1,7 @@
 /*
 -------------------------------------
-File:   Question1.c
-Project: CP386 Assignment 2
+File:   BankersAlgorithm.c
+Project: CP386 Assignment 4
 Creates threads in a function and with the main and prints which is active, each runs 5 times
 -------------------------------------
 Author:  Riley Adams & Torin Borton-McCallum
