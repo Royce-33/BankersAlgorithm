@@ -29,3 +29,51 @@ Version  2021-06-18
  *      * "*" -> Display the current state of available, maximum, allocation, and need arrays
  *      * "Run" -> Executes the safe sequence based on the current state and all the threads run the same function code and prints (see assign page for example output)
  */
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<pthread.h>
+#include<semaphore.h>
+#include<stdbool.h>
+
+/* BEGIN STRUCTURE FUNCTION AND GLOBAL VARIABLE DEFINITION */
+const int NUM_RESOURCES = 4; //Change me if you want to change the number resources available
+
+typedef struct customer {
+
+    int maximum[NUM_RESOURCES];
+    int allocated[NUM_RESOURCES];
+    int need[NUM_RESOURCES];
+
+} customer;
+
+
+int main(int argc, char *args[]);
+int customer_init(int maximum_resources[]);
+int read_file(FILE file);
+int request_resources(customer customer);
+int release_resources(customer customer);
+
+
+
+
+
+int num_customers = 0;
+int availabe_resources[NUM_RESOURCES];
+/* END DEFINITIONS */
+
+
+
+
+int main (int argc, char *args[]) {
+
+
+
+
+}
+
+int read_file(FILE file) {
+
+    
+}
