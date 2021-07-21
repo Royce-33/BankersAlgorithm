@@ -1,6 +1,6 @@
 /*
 -------------------------------------
-File:   BankersAlgorithm.c
+File:   BankersAlgorithm.c           for submission change it to "190416070_190824620_a04.c"
 Project: CP386 Assignment 4
 Creates threads in a function and with the main and prints which is active, each runs 5 times
 -------------------------------------
@@ -33,25 +33,28 @@ Version  2021-06-18
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
+#include<string.h>
 #include<pthread.h>
 #include<semaphore.h>
 #include<stdbool.h>
 
 /* BEGIN STRUCTURE FUNCTION AND GLOBAL VARIABLE DEFINITION */
 const int NUM_RESOURCES = 4; //Change me if you want to change the number resources available
-
+const char *FILE_NAME = "sample4_in.txt";
+const int BUFFER_SIZE = 32;
 typedef struct customer {
 
-    int maximum[NUM_RESOURCES];
-    int allocated[NUM_RESOURCES];
-    int need[NUM_RESOURCES];
+    char *maximum[NUM_RESOURCES];
+    char *allocated[NUM_RESOURCES];
+    char *need[NUM_RESOURCES];
+    int id;
 
 } customer;
 
 
 int main(int argc, char *args[]);
-int customer_init(int maximum_resources[]);
-int read_file(FILE file);
+int read_file();
+int customer_init(char *maximum_resources[]);
 int request_resources(customer customer);
 int release_resources(customer customer);
 
@@ -68,12 +71,46 @@ int availabe_resources[NUM_RESOURCES];
 
 int main (int argc, char *args[]) {
 
-
+    read_file(); //read in the contents of the file and initialize customer objects
 
 
 }
 
-int read_file(FILE file) {
 
+/**
+ * Reads the given input file and passes each line as an array of ints to the customer_init function
+ */
+int read_file() {
+
+    FILE *in_file = fopen(FILE_NAME, "r"); //open the file in read mode
+    char *line = NULL;
     
+    int i = 0;
+    //while we haven't reached the end of the file, read the current line into a char array and pass it to customer_init
+    while (fgets(line, BUFFER_SIZE, in_file) != EOF) {
+
+        char *curr_max[NUM_RESOURCES];
+
+        for ( fgets(line, BUFFER_SIZE, in_file) == "\n\r" ; i++; ) {
+
+            curr_max[i] = strtok(line, " ");
+            printf("Adding %s to curr_max array\n");
+            strtok(NULL, " ");
+
+        }
+
+        num_customers++; //update the number of customers
+        customer_init(curr_max); //current maximum resource allocation is set, initialize the customer object
+
+    }
+
+}
+
+/**
+ * Helper function used in read_file(), takes the given array of ints and initializes a new customer object
+ */
+int customer_init(char *maximum_resources[]){
+
+
+
 }
