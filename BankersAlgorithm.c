@@ -39,7 +39,7 @@ Version  2021-06-18
 #include<stdbool.h>
 
 /* BEGIN STRUCTURE FUNCTION AND GLOBAL VARIABLE DEFINITION */
-const int NUM_RESOURCES = 4; //Change me if you want to change the number resources available
+#define NUM_RESOURCES 4 //Change me if you want to change the number resources available
 const char *FILE_NAME = "sample4_in.txt";
 const int BUFFER_SIZE = 32;
 typedef struct customer {
@@ -73,7 +73,7 @@ int main (int argc, char *args[]) {
 
     read_file(); //read in the contents of the file and initialize customer objects
 
-
+    return 0;
 }
 
 
@@ -83,24 +83,29 @@ int main (int argc, char *args[]) {
 int read_file() {
 
     FILE *in_file = fopen(FILE_NAME, "r"); //open the file in read mode
-    char *line = NULL;
     
-    int i = 0;
+    char line[BUFFER_SIZE];
+     
     //while we haven't reached the end of the file, read the current line into a char array and pass it to customer_init
-    while (fgets(line, BUFFER_SIZE, in_file) != EOF) {
-
+    while ( !feof(in_file) ) {
+        //printf("passed end of file check\n");
         char *curr_max[NUM_RESOURCES];
 
-        for ( fgets(line, BUFFER_SIZE, in_file) == "\n\r" ; i++; ) {
+        for (int i = 0; fgets(line, BUFFER_SIZE, in_file) != NULL ; i++ ) { //this for loop currently only takes the first number from each line because of how strtok works
 
-            curr_max[i] = strtok(line, " ");
-            printf("Adding %s to curr_max array\n");
-            strtok(NULL, " ");
+            printf("contents of line: %s", line);
+            curr_max[i] = strtok(line, ",");
+            printf("curr_max array contents: %s\n", *curr_max);
+            printf("Adding %s to curr_max array\n", curr_max[i]);
+            strtok(NULL, "");
+
+            num_customers++; //update the number of customers
+            printf("updated num customers: %d\n", num_customers);
+            customer_init(curr_max); //current maximum resource allocation is set, initialize the customer object
 
         }
 
-        num_customers++; //update the number of customers
-        customer_init(curr_max); //current maximum resource allocation is set, initialize the customer object
+        
 
     }
 
