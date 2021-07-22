@@ -72,14 +72,15 @@ customer *customers = NULL; //pointer to a list of customers
 
 int main (int argc, char *args[]) {
 
-    customers = (customer *) malloc(sizeof(customer) * 5);
+    //customers = (customer *) malloc(sizeof(customer) * 5);
 
     
-    read_file(customers); //read in the contents of the file and initialize customer objects
+    read_file(); //read in the contents of the file and initialize customer objects
     //printf("contents of the global customer list: %s\n", customers);
 
-    for (int i = 0; i < 5; i++) {
-
+    for (int i = 0; i < 5; i++) { //in current state everything gets assigned properly within read_file's local list, but once the global variable is assigned that list, all the needs and max values are the same
+        printf("%d: current resource allocation: %s\n", customers[i].id, customers[i].allocated);
+        printf("%d: needed resource allocation: %s\n", customers[i].id, customers[i].need);
         printf("%d: maximum resource allocation: %s\n", customers[i].id, customers[i].maximum);
     }
 
@@ -91,15 +92,15 @@ int main (int argc, char *args[]) {
 /**
  * Reads the given input file and passes each line as an array of ints to the customer_init function
  */
-int read_file(customer** customers) {
+int read_file() {
 
     FILE *in_file = fopen(FILE_NAME, "r"); //open the file in read mode
     
     char line[BUFFER_SIZE];
-    int customer_counter = 1; //helps to realloc the size of the pointer list properly
+    int customer_counter = 2; //helps to realloc the size of the pointer list properly
     customer *incoming_customers = NULL; //works similairly to the global list, collects each customer as it comes in
 
-    incoming_customers = (customer *) malloc(sizeof(customer)); //intial setup so it can take a customer, and will resize to fit more
+    incoming_customers = malloc(sizeof(customer)); //intial setup so it can take a customer, and will resize to fit more
     
     //while we haven't reached the end of the file, read the current line into a char array and pass it to customer_init
     while ( !feof(in_file) ) {
@@ -112,29 +113,27 @@ int read_file(customer** customers) {
 
             
 
-            printf("contents of line: %s", line);
+            //printf("contents of line: %s", line);
             curr_max[i] = strtok(line, "\r\n");
-            printf("curr_max array contents: %s\n", *curr_max);
-            printf("Adding %s to curr_max array\n", curr_max[i]);
+            //printf("curr_max array contents: %s\n", *curr_max);
+            //printf("Adding %s to curr_max array\n", curr_max[i]);
             strtok(NULL, "");
 
             num_customers++; //update the number of customers globally
-            printf("updated num customers: %d\n", num_customers);
+            //printf("updated num customers: %d\n", num_customers);
             
             //customer_init(curr_max);
             incoming_customers[i] = *(customer_init(curr_max)); //current maximum resource allocation is set, initialize the customer object
             printf("current maximum resources value of incoming customers at position %d: %s\n", incoming_customers[i].id, incoming_customers[i].maximum);
             customer_counter++; //updating realloc counter
-            incoming_customers = (customer *) realloc( incoming_customers, (sizeof(customer) * customer_counter) ); //increasing the size of the list so it can fit the next customer
+            incoming_customers = realloc( incoming_customers, (sizeof(customer) * customer_counter) ); //increasing the size of the list so it can fit the next customer
             
         }
         
 
     }
 
-    customers = &incoming_customers; //we have received all incoming customers, pass the list to the global variable 
-                                    //in current state something doeesn't work with the assignment, iterating through the global list still produces null values
-
+    customers = *(&incoming_customers); //we have received all incoming customers, pass the list to the global variable                              
 
     return 0;
 
