@@ -8,7 +8,7 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
 
 ## Contributions
 ### Riley's Contribution
-
+    - Implemented read_file function
 ### Torin's Contribution
 
 
