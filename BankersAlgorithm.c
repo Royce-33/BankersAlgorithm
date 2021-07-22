@@ -44,9 +44,9 @@ const char *FILE_NAME = "sample4_in.txt";
 const int BUFFER_SIZE = 32;
 typedef struct customer {
 
-    char *maximum[NUM_RESOURCES];
-    char *allocated[NUM_RESOURCES];
-    char *need[NUM_RESOURCES];
+    char *maximum;
+    char *allocated;
+    char *need;
     int id;
 
 } customer;
@@ -64,6 +64,7 @@ int release_resources(customer customer);
 
 int num_customers = 0;
 int availabe_resources[NUM_RESOURCES];
+customer *customers = NULL; //pointer to a list of customers
 /* END DEFINITIONS */
 
 
@@ -71,7 +72,7 @@ int availabe_resources[NUM_RESOURCES];
 
 int main (int argc, char *args[]) {
 
-    read_file(); //read in the contents of the file and initialize customer objects
+    read_file(customers); //read in the contents of the file and initialize customer objects
 
     return 0;
 }
@@ -80,21 +81,22 @@ int main (int argc, char *args[]) {
 /**
  * Reads the given input file and passes each line as an array of ints to the customer_init function
  */
-int read_file() {
+int read_file(customer** customers) {
 
     FILE *in_file = fopen(FILE_NAME, "r"); //open the file in read mode
     
     char line[BUFFER_SIZE];
+    customer *incoming_customers = NULL; //works similairly to the global list, collects each customer as it comes in
      
     //while we haven't reached the end of the file, read the current line into a char array and pass it to customer_init
     while ( !feof(in_file) ) {
         //printf("passed end of file check\n");
         char *curr_max[NUM_RESOURCES];
 
-        for (int i = 0; fgets(line, BUFFER_SIZE, in_file) != NULL ; i++ ) { //this for loop currently only takes the first number from each line because of how strtok works
+        for (int i = 0; fgets(line, BUFFER_SIZE, in_file) != NULL ; i++ ) { //this for loop takes each line in the file and sends it off to customer_init
 
             printf("contents of line: %s", line);
-            curr_max[i] = strtok(line, ",");
+            curr_max[i] = strtok(line, "\r\n");
             printf("curr_max array contents: %s\n", *curr_max);
             printf("Adding %s to curr_max array\n", curr_max[i]);
             strtok(NULL, "");
@@ -102,20 +104,42 @@ int read_file() {
             num_customers++; //update the number of customers
             printf("updated num customers: %d\n", num_customers);
             customer_init(curr_max); //current maximum resource allocation is set, initialize the customer object
-
+            
         }
 
         
 
     }
 
+    customers = &incoming_customers; //we have received all incoming customers, pass the list to the global variable
+
 }
 
 /**
  * Helper function used in read_file(), takes the given array of ints and initializes a new customer object
  */
-int customer_init(char *maximum_resources[]){
+int customer_init(char *maximum_resources[]) {
 
+    customer *new_customer = (customer *) malloc(sizeof(customer));
+    
+    new_customer->maximum = *maximum_resources;
+    new_customer->need = *maximum_resources;
+    new_customer->allocated = malloc(NUM_RESOURCES);
+    
+    for (int i = 0; i < NUM_RESOURCES; i++) {
+        //strcpy(new_customer->allocated, "0");
+        if (i == NUM_RESOURCES - 1) {
+            strcat(new_customer->allocated, "0");
+            break;
+        }
+        strcat(new_customer->allocated, "0,");
+    }
+
+    new_customer->id = num_customers - 1; //takes the non-updated num_customers so first customer id is zero and so on
+
+    printf("%d: Setting max resources to: %s\n", new_customer->id, new_customer->maximum);
+    printf("%d: Setting needed resources to: %s\n", new_customer->id, new_customer->need);
+    printf("%d: Setting allocated resources to: %s\n", new_customer->id, new_customer->allocated);
 
 
 }
