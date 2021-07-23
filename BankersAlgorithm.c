@@ -79,7 +79,7 @@ int main (int argc, char *args[]) {
     //printf("contents of the global customer list: %s\n", customers);
 
     for (int i = 0; i < 5; i++) { //in current state everything gets assigned properly within read_file's local list, but once the global variable is assigned that list, all the needs and max values are the same
-        printf("%d: current resource allocation: %s\n", customers[i].id, customers[i].allocated);
+        //printf("%d: current resource allocation: %s\n", customers[i].id, customers[i].allocated);
         printf("%d: needed resource allocation: %s\n", customers[i].id, customers[i].need);
         printf("%d: maximum resource allocation: %s\n", customers[i].id, customers[i].maximum);
     }
@@ -132,6 +132,11 @@ int read_file() {
         
 
     }
+
+    for (int i = 0; i < customer_counter; i++) {
+        printf("%d: local list maximum resources: %s\n", incoming_customers[i].id, incoming_customers[i].maximum);
+    }
+
 
     customers = *(&incoming_customers); //we have received all incoming customers, pass the list to the global variable                              
 
