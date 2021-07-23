@@ -55,7 +55,7 @@ typedef struct customer {
 int main(int argc, char *args[]);
 int read_file();
 customer *customer_init(char **maximum_resources);
-int request_resources(customer customer);
+int request_resources(customer *customer);
 int release_resources(customer customer);
 
 
@@ -63,7 +63,7 @@ int release_resources(customer customer);
 
 
 int num_customers = 0;
-int availabe_resources[NUM_RESOURCES];
+char availabe_resources[32];
 customer *customers = NULL; //pointer to a list of customers
 
 /* END DEFINITIONS */
@@ -75,17 +75,66 @@ int main (int argc, char *args[]) {
 
     //customers = (customer *) malloc(sizeof(customer) * 5);
     
+    if (argc < 2) {
 
-    
-    
-    read_file(); //read in the contents of the file and initialize customer objects
+        printf("main -> Not enough available resources inputted, please try again!\n");
+        return -1;
+    }
+
+    else {
+        
+        for (int i = 0; i < argc; i++) {
+
+            printf("%d argument: %s\n", i, args[i]);
+
+        }
+
+
+
+
+        for (int i = 0; i < argc; i++) {
+
+            //printf("Current argument: %s\n", args[i]);
+            if ( i == 0 )
+                continue;
+
+
+            else if (i == argc - 1) {
+                strcat(availabe_resources, args[i]);
+            }
+
+            else {
+
+                char *temp = args[i];
+                //strcat(temp, ",");
+                strcat(availabe_resources, temp);
+            }
+               
+        }
+        
+        
+        read_file(); //read in the contents of the file and initialize customer objects
     //printf("contents of the global customer list: %s\n", customers);
 
-    for (int i = 0; i < 5; i++) { //in current state everything gets assigned properly within read_file's local list, but once the global variable is assigned that list, all the needs and max values are the same
-        //printf("%d: current resource allocation: %s\n", customers[i].id, customers[i].allocated);
-        printf("%d: needed resource allocation: %s\n", customers[i].id, customers[i].need);
-        printf("%d: maximum resource allocation: %s\n", customers[i].id, customers[i].maximum);
+        for (int i = 0; i < num_customers; i++) { //in current state everything gets assigned properly within read_file's local list, but once the global variable is assigned that list, all the needs and max values are the same
+            //printf("%d: current resource allocation: %s\n", customers[i].id, customers[i].allocated);
+            printf("%d: needed resource allocation: %s\n", customers[i].id, customers[i].need);
+            printf("%d: maximum resource allocation: %s\n", customers[i].id, customers[i].maximum);
+        }
+
+        printf("Number of customers: %d\n", num_customers);
+
+        printf("Currently available resources: %s\n", availabe_resources);
+
+        printf("Maximum resources from file:\n");
+
+        for (int i = 0; i < num_customers; i++) {
+            printf("%s\n", customers[i].maximum);
+        }
+
+
     }
+
 
 
     return 0;
@@ -176,5 +225,25 @@ customer *customer_init(char **maximum_resources) {
     printf("%d: Setting allocated resources to: %s\n", new_customer->id, new_customer->allocated);
 
     return new_customer;
+
+}
+
+/**
+ * Function used to request resources from the banker
+ */
+int request_resources(customer *customer){
+
+    char *customer_max = customer->maximum;
+    char *customer_need = customer->need;
+    char *customer_allocated = customer->allocated;
+    int customer_id = customer->id;
+
+    if (customer_need == "0,0,0,0" || customer_allocated == customer_max) { //if the customer does not need more or has reached the maximum allocated
+
+
+    }
+
+
+
 
 }
