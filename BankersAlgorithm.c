@@ -104,7 +104,7 @@ int main (int argc, char *args[]) {
             }
 
             else {
-                char *temp = malloc(32);
+                char *temp = malloc(NUM_RESOURCES);
                 strcpy(temp, args[i]);
                 strcat(temp, ",");
                 printf("temp value: %s\n", temp);
