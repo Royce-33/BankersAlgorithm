@@ -104,10 +104,12 @@ int main (int argc, char *args[]) {
             }
 
             else {
-
-                char *temp = args[i];
-                //strcat(temp, ",");
+                char *temp = malloc(32);
+                strcpy(temp, args[i]);
+                strcat(temp, ",");
+                printf("temp value: %s\n", temp);
                 strcat(availabe_resources, temp);
+                free(temp);
             }
                
         }
