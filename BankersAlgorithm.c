@@ -84,28 +84,19 @@ int main (int argc, char *args[]) {
     }
 
     else {
-        
-        // for (int i = 0; i < argc; i++) {
-
-        //     printf("%d argument: %s\n", i, args[i]);
-
-        // }
-
-
-
 
         for (int i = 0; i < argc; i++) { //setting up available resources as defined with input
 
             //printf("Current argument: %s\n", args[i]);
-            if ( i == 0 )
-                continue;
-
-            else {
+            if ( i != 0 ) {
                 printf("current arg: %s\n", args[i]);
                 int curr_arg = atoi(args[i]);
+                printf("integer version: %d\n", curr_arg);
                 availabe_resources[i] = curr_arg;
-
+                printf("array element %d: %d\n", i, availabe_resources[i]);
             }
+                
+
                
         }
         
@@ -273,6 +264,14 @@ int request_resources(customer *customer){
     int *customer_allocated = customer->allocated;
     int customer_id = customer->id;
 
+
+
+
+
+
+    //this way would've been a NIGHTMARE to compare each element in the string etc, and then making decisions and doing the appropriate math, which is why I 
+    //changed the structure of the customer to be ints so we can easily compare resources and do math appropriately
+    
     // if (customer_need == "0,0,0,0" || customer_allocated == customer_max) { //if the customer does not need more or has reached the maximum allocated
 
     //     printf("%d: Customer already has maximum allocation of resources!\n", customer->id);
