@@ -46,9 +46,9 @@ const char *FILE_NAME = "sample4_in.txt";
 const int BUFFER_SIZE = 32;
 typedef struct customer {
 
-    char *maximum;
-    char *allocated;
-    char *need;
+    int *maximum;
+    int *allocated;
+    int *need;
     int id;
 
 } customer;
@@ -56,7 +56,7 @@ typedef struct customer {
 
 int main(int argc, char *args[]);
 int read_file();
-customer *customer_init(char **maximum_resources);
+customer *customer_init(int *maximum_resources);
 int request_resources(customer *customer);
 int release_resources(customer customer);
 
@@ -65,7 +65,7 @@ int release_resources(customer customer);
 
 
 int num_customers = 0;
-char availabe_resources[32];
+int availabe_resources[32];
 customer *customers = NULL; //pointer to a list of customers
 
 /* END DEFINITIONS */
@@ -94,24 +94,17 @@ int main (int argc, char *args[]) {
 
 
 
-        for (int i = 0; i < argc; i++) {
+        for (int i = 0; i < argc; i++) { //setting up available resources as defined with input
 
             //printf("Current argument: %s\n", args[i]);
             if ( i == 0 )
                 continue;
 
-
-            else if (i == argc - 1) {
-                strcat(availabe_resources, args[i]);
-            }
-
             else {
-                char *temp = malloc(NUM_RESOURCES);
-                strcpy(temp, args[i]);
-                strcat(temp, ",");
-                //printf("temp value: %s\n", temp);
-                strcat(availabe_resources, temp);
-                free(temp);
+                printf("current arg: %s\n", args[i]);
+                int curr_arg = atoi(args[i]);
+                availabe_resources[i] = curr_arg;
+
             }
                
         }
@@ -120,20 +113,35 @@ int main (int argc, char *args[]) {
         read_file(); //read in the contents of the file and initialize customer objects
         //printf("contents of the global customer list: %s\n", customers);
 
-        for (int i = 0; i < num_customers; i++) { //in current state everything gets assigned properly within read_file's local list, but once the global variable is assigned that list, all the needs and max values are the same
-            //printf("%d: current resource allocation: %s\n", customers[i].id, customers[i].allocated);
-            printf("%d: needed resource allocation: %s\n", customers[i].id, customers[i].need);
-            printf("%d: maximum resource allocation: %s\n", customers[i].id, customers[i].maximum);
-        }
-
         printf("Number of customers: %d\n", num_customers);
 
-        printf("Currently available resources: %s\n", availabe_resources);
+        printf("Currently available resources:");
+
+        for (int i = 0; i < NUM_RESOURCES; i++){
+            if (i == NUM_RESOURCES - 1)
+                printf(" %d\n", availabe_resources[i]);
+
+            else    
+                printf(" %d", availabe_resources[i]);
+        }
 
         printf("Maximum resources from file:\n");
 
         for (int i = 0; i < num_customers; i++) {
-            printf("%s\n", customers[i].maximum);
+           
+            for (int j = 0; j < NUM_RESOURCES; j++) {
+
+                if (j == NUM_RESOURCES - 1) {
+                    printf(" %d\n", customers[i].maximum[j]);
+                }
+
+                // else if (j == 0)
+                //     printf("%d ", customers[i].maximum[j]);
+
+                else
+                    printf(" %d", customers[i].maximum[j]);
+            }
+
         }
 
 
@@ -169,14 +177,13 @@ int read_file() {
             char *line_token = fgets(line, BUFFER_SIZE, in_file); //
             //printf("line_token value: %s\n", line_token);
             
-            char *curr_max[NUM_RESOURCES];
+            int curr_max[NUM_RESOURCES];
             char *char_token = strtok(line_token, ",");
             int i = 0;
             while (char_token != NULL) {
                 
-                
-                curr_max[i] = char_token;
-                printf("curr_max[i] value: %s\n", curr_max[i]);
+                curr_max[i] = atoi(char_token);
+                printf("curr_max[i] value: %d\n", curr_max[i]);
                 char_token = strtok(NULL, ",");
                 i++;
 
@@ -201,115 +208,56 @@ int read_file() {
     return 0;
 
 }
-
-
-
-
-
-
-    /**
-     * Prev read_file code that i was having issues with
-     */
-    //while we haven't reached the end of the file, read the current line into a char array and pass it to customer_init
-    //while ( !feof(in_file) ) {
-        //printf("passed end of file check\n");
-        // char *curr_max[NUM_RESOURCES];
-        // int i = 0;
-        // while (fgets(line, BUFFER_SIZE, in_file) != NULL) {
-            
-
-
-        //     char *line_token = strtok(line, "\r\n");
-
-            
-        //     strcat(line_token, "\0");
-        //     printf("line token value: %s\n", line_token);
-        //     int j = 0;
-
-        //     while (line_token != NULL) {
-
-        //         char *curr_token = strtok(line_token, ",");
-        //         printf("curr_token value: %s\n", curr_token);
-        //         curr_max[j] = curr_token;
-
-        //         curr_token = strtok(NULL, ",");
-        //         j++;
-        //     }
-
-        //     num_customers++;
-
-        //     incoming_customers[i] = *(customer_init(curr_max));
-        //     printf("current maximum resources value of incoming customers at position %d: %s\n", incoming_customers[i].id, incoming_customers[i].maximum);
-        //     customer_counter++;
-
-        //     incoming_customers = realloc( incoming_customers, (sizeof(customer) * customer_counter) ); //increasing the size of the list so it can fit the next customer
-
-        //     line_token = strtok(NULL, "\r\n");
-        //     i++;
-
-        //}
-
-
-        // for (int i = 0; fgets(line, BUFFER_SIZE, in_file) != NULL ; i++ ) { //this for loop takes each line in the file and sends it off to customer_init
-
-            
-
-        //     //printf("contents of line: %s", line);
-        //     curr_max[i] = strtok(line, "\r\n");
-        //     //printf("curr_max array contents: %s\n", *curr_max);
-        //     //printf("Adding %s to curr_max array\n", curr_max[i]);
-        //     strtok(NULL, "");
-
-        //     num_customers++; //update the number of customers globally
-        //     //printf("updated num customers: %d\n", num_customers);
-            
-        //     //customer_init(curr_max);
-        //     incoming_customers[i] = *(customer_init(curr_max)); //current maximum resource allocation is set, initialize the customer object
-        //     printf("current maximum resources value of incoming customers at position %d: %s\n", incoming_customers[i].id, incoming_customers[i].maximum);
-        //     customer_counter++; //updating realloc counter
-            
-            
-        //     incoming_customers = realloc( incoming_customers, (sizeof(customer) * customer_counter) ); //increasing the size of the list so it can fit the next customer
-            
-        // }
-        
-
-    //}
-
-    // for (int i = 0; i < customer_counter; i++) { //in current state, customer objects are created properly, but the list of objects has max and need properties of only the last entry
-    //     printf("%d: local list maximum resources: %s\n", incoming_customers[i].id, incoming_customers[i].maximum);
-    //}
-
-
-    //customers = *(&incoming_customers); //we have received all incoming customers, pass the list to the global variable                              
-
-
+                          
 
 /**
  * Helper function used in read_file(), takes the given array of ints and initializes a new customer object
  */
-customer *customer_init(char **maximum_resources) {
+customer *customer_init(int *maximum_resources) {
 
     customer *new_customer = (customer *) malloc(sizeof(customer));
     
-    new_customer->maximum = *maximum_resources;
-    new_customer->need = *maximum_resources;
+    new_customer->maximum = maximum_resources;
+    new_customer->need = maximum_resources;
     new_customer->allocated = malloc(NUM_RESOURCES);
     
     for (int i = 0; i < NUM_RESOURCES; i++) {
-        //strcpy(new_customer->allocated, "0");
-        if (i == NUM_RESOURCES - 1) {
-            strcat(new_customer->allocated, "0");
-            break;
-        }
-        strcat(new_customer->allocated, "0,");
+        new_customer->allocated[i] = 0;
     }
 
     new_customer->id = num_customers - 1; //takes the non-updated num_customers so first customer id is zero and so on
 
-    printf("%d: Setting max resources to: %s\n", new_customer->id, new_customer->maximum);
-    printf("%d: Setting needed resources to: %s\n", new_customer->id, new_customer->need);
-    printf("%d: Setting allocated resources to: %s\n", new_customer->id, new_customer->allocated);
+    printf("%d: Setting max resources to:", new_customer->id);
+
+    for (int i = 0; i < NUM_RESOURCES; i++) {
+
+        if (i == NUM_RESOURCES - 1) {
+            printf(" %d\n", new_customer->maximum[i]);
+        }
+        else
+            printf(" %d", new_customer->maximum[i]);
+    }
+
+    printf("%d: Setting needed resources to:", new_customer->id);
+
+    for (int i = 0; i < NUM_RESOURCES; i++) {
+
+        if (i == NUM_RESOURCES - 1) {
+            printf(" %d\n", new_customer->need[i]);
+        }
+        else
+            printf(" %d", new_customer->need[i]);
+    }
+    printf("%d: Setting allocated resources to:", new_customer->id);
+
+    for (int i = 0; i < NUM_RESOURCES; i++) {
+
+        if (i == NUM_RESOURCES - 1) {
+            printf(" %d\n", new_customer->allocated[i]);
+        }
+        else
+            printf(" %d", new_customer->allocated[i]);
+    }
 
     return new_customer;
 
@@ -320,18 +268,18 @@ customer *customer_init(char **maximum_resources) {
  */
 int request_resources(customer *customer){
 
-    char *customer_max = customer->maximum;
-    char *customer_need = customer->need;
-    char *customer_allocated = customer->allocated;
+    int *customer_max = customer->maximum;
+    int *customer_need = customer->need;
+    int *customer_allocated = customer->allocated;
     int customer_id = customer->id;
 
-    if (customer_need == "0,0,0,0" || customer_allocated == customer_max) { //if the customer does not need more or has reached the maximum allocated
+    // if (customer_need == "0,0,0,0" || customer_allocated == customer_max) { //if the customer does not need more or has reached the maximum allocated
 
-        printf("%d: Customer already has maximum allocation of resources!\n", customer->id);
+    //     printf("%d: Customer already has maximum allocation of resources!\n", customer->id);
 
-    }
+    // }
 
-    printf("comparing strings %d and %d: strcmp() result: %d\n", availabe_resources[0], customer_need[0], strcmp(&availabe_resources[0], &customer_need[0]));
+    //printf("comparing strings %d and %d: strcmp() result: %d\n", availabe_resources[0], customer_need[0], strcmp(&availabe_resources[0], &customer_need[0]));
 
 
     //else if ()
