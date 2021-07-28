@@ -40,6 +40,7 @@ Version  2021-06-18
 #include<semaphore.h>
 #include<stdbool.h>
 
+
 /* BEGIN STRUCTURE FUNCTION AND GLOBAL VARIABLE DEFINITION */
 #define NUM_RESOURCES 4 //Change me if you want to change the number resources available
 const char *FILE_NAME = "sample4_in.txt";
@@ -58,7 +59,7 @@ typedef struct customer {
 int main(int argc, char *args[]);
 int read_file();
 customer *customer_init(int *maximum_resources);
-int request_resources(customer *customer, int *requested_resources);
+void *request_resources(customer *customer, int *requested_resources);
 int release_resources(customer customer);
 int command_handler();
 
@@ -296,7 +297,7 @@ customer *customer_init(int *maximum_resources) {
 /**
  * Function used to request resources from the banker
  */
-int request_resources(customer *customer, int *request_resources){
+void *request_resources(customer *customer, int *request_resources){
 
     int *customer_max = customer->maximum;// read file 
     int *customer_need = customer->need; //customer_max - customer_allocated
@@ -305,46 +306,68 @@ int request_resources(customer *customer, int *request_resources){
     // available resources (original) = user input -> Currently Available resources:10 5 7 8
     //remaining resourcesa = available resources [i] - allocated resources[i]
     
-    //fail 
-    for (int i = 0; i < 4; i ++){
-        if (available_resources[i] - customer_allocated[i] < 0){
-            //failure print statement
+    //printf("request resources called with customer id: %d\n", customer->id);
+
+    // for (int i = 0; i < NUM_RESOURCES; i++) {
+
+    //     printf("request resources array element %d value: %d\n", i, request_resources[i]);
+    // }
+
+
+    bool safe = true;
+    bool have_max = true;
+    for (int i = 0; i < NUM_RESOURCES; i++) { //checking each type of resource to make sure it can be safely allocated
+
+        //printf("%dth value of available resources: %d\n", i, available_resources[i]);
+
+
+        if (request_resources[i] > available_resources[i+1]) { //available needs to be +1 because of weird behaviour when available is being set
+            //request is bigger than available
+            //printf("%d: comparing requested: %d and available: %d set safe to false\n", i, request_resources[i], available_resources[i]);
+            safe = false;
         }
-        else{
-            available_resources[i] = available_resources[i] - customer_allocated[i];
-            customer_need[i] = customer_max[i] - customer_allocated[i];
+
+        //printf("current value of customer allocated: %d\n", customer_allocated[i]);
+        //printf("current value of customer max: %d\n", customer_max[i]);
+        if (customer_allocated[i] != customer_max[i]) {
+            //requesting customer does not have its max resources
+            have_max = false; 
         }
+
+    }
+
+    //printf("values of safe:%d\nand have_max:%d\n", safe, have_max);
+
+    if (safe && !(have_max)) { //if the request is safe and the customer does not have its max resources
+
+        printf("Request is safe, granting resources.\n");
+
+        for (int i = 0; i < NUM_RESOURCES; i++) {
+
+            customer_allocated[i] += request_resources[i];
+            customer_need[i] -= request_resources[i];
+            available_resources[i+1] -= request_resources[i];
+        }
+
     }
 
 
-
-
-
-    //this way would've been a NIGHTMARE to compare each element in the string etc, and then making decisions and doing the appropriate math, which is why I 
-    //changed the structure of the customer to be ints so we can easily compare resources and do math appropriately
-    
-    // if (customer_need == "0,0,0,0" || customer_allocated == customer_max) { //if the customer does not need more or has reached the maximum allocated
-
-    //     printf("%d: Customer already has maximum allocation of resources!\n", customer->id);
-
+    //fail 
+    // for (int i = 0; i < 4; i ++){
+    //     if (available_resources[i] - customer_allocated[i] < 0){
+    //         //failure print statement
+    //     }
+    //     else{
+    //         available_resources[i] = available_resources[i] - customer_allocated[i];
+    //         customer_need[i] = customer_max[i] - customer_allocated[i];
+    //     }
     // }
-
-    //printf("comparing strings %d and %d: strcmp() result: %d\n", availabe_resources[0], customer_need[0], strcmp(&availabe_resources[0], &customer_need[0]));
-
-
-    //else if ()
-
     
 
-
+    return 0;
 
 
 }
-
-
-
-
-
 
 /**
  * Function used to handle user inputted commands once customer object setup is complete
@@ -373,12 +396,46 @@ int command_handler() {
             int customer_id = atoi(command);
             while(command != NULL) {
                 
-                command = strtok(NULL, " ");
-                request[i] = atoi(command);
-                printf("value of request[i]: %d\n", request[i]);
-                i++;
+                if (i < NUM_RESOURCES) {
+                    //printf("Current value of command: %s\n", command);
+                    command = strtok(NULL, " ");
+                    request[i] = atoi(command);
+                    //printf("value of request[i]: %d\n", request[i]);
+                    i++;
+                }
+
+                else
+                    break;
+                
             }
+
+            //printf("Now beginning thread creation\n");
+            //now that we have our parameters pass the input and the request function call to a new thread
+            customer *requesting_customer = &customers[customer_id + 1]; //needs to be plus one because the extra space from realloc sits at the start of the list
             
+            pthread_t thread_id;
+            pthread_attr_t thread_attributes;
+            int status;
+
+            status = pthread_attr_init(&thread_attributes);
+
+            if (status != 0) {
+                printf("Error creating thread attributes for request command!\n");
+            }
+            //printf("Thread attributes created\n");
+
+            //In current state, program seg faults at the end of the created thread
+            //status = pthread_create(&thread_id, &thread_attributes, request_resources(requesting_customer, request), (requesting_customer, request));
+            request_resources(requesting_customer, request);
+            
+            if (status != 0) {
+                printf("Error creating thread for request command!\n");
+
+            }
+
+            //pthread_join(thread_id, NULL);
+            
+            command_handler();
 
         }
 
@@ -389,10 +446,103 @@ int command_handler() {
 
         //if the first set of characters is Status, then create a thread that calls the display_status function
 
+        if (strcmp(command, "Status") == 0) {
 
+            //prints Available resources
+            printf("Available Resources:\n");
+            for (int i = 1; i < NUM_RESOURCES + 1; i++) {
+
+                if (i == 1) {
+                    printf("%d", available_resources[i]);
+                }
+
+                else if (i == (NUM_RESOURCES + 1) - 1) {
+                    printf(" %d\n", available_resources[i]);
+                }
+
+                else {
+                    printf(" %d", available_resources[i]);
+                }
+
+            }
+
+            //prints Maximum resources
+            printf("Maximum Resources:\n");
+            for (int i = 1; i < num_customers + 1; i++) { //need it starting at 1 and going over num_customers by one because empty space from realloc is at the start of the list
+
+                for (int j = 0; j < NUM_RESOURCES; j++) {
+
+                    if (j == 0) {
+                        printf("%d: %d", customers[i].id, customers[i].maximum[j]);
+                    }
+
+                    else if (j == NUM_RESOURCES - 1) {
+                        printf(" %d\n", customers[i].maximum[j]);
+                    }
+
+                    else {
+                        printf(" %d", customers[i].maximum[j]);
+                    }
+
+                }
+
+            }
+
+            //prints Allocated resources
+            printf("Allocated Resources:\n");
+            for (int i = 1; i < num_customers + 1; i++) {
+
+                for (int j = 0; j < NUM_RESOURCES; j++) {
+
+                    if (j == 0) {
+                        printf("%d: %d", customers[i].id, customers[i].allocated[j]);
+                    }
+
+                    else if (j == NUM_RESOURCES - 1) {
+                        printf(" %d\n", customers[i].allocated[j]);
+                    }
+
+                    else {
+                        printf(" %d", customers[i].allocated[j]);
+                    }
+
+                }
+            }
+
+            //prints Needed resources
+            printf("Needed Resources:\n");
+            for (int i = 1; i < num_customers + 1; i++) {
+
+                for (int j = 0; j < NUM_RESOURCES; j++) {
+
+                    if (j == 0) {
+                        printf("%d: %d", customers[i].id, customers[i].need[j]);
+                    }
+
+                    else if (j == NUM_RESOURCES - 1) {
+                        printf(" %d\n", customers[i].need[j]);
+                    }
+
+                    else {
+                        printf(" %d", customers[i].need[j]);
+                    }
+                }
+
+            }
+
+            command_handler();
+
+        }
+
+        else {
+            printf("Command not recognized, please try again!\n");
+            command_handler();
+
+        }
 
     }
 
     printf(">>> Program Terminated.\n");
+    exit(0);
 
 }
