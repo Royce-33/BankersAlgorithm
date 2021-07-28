@@ -68,6 +68,8 @@ int num_customers = 0;
 int available_resources[32];
 customer *customers = NULL; //pointer to a list of customers
 
+
+
 /* END DEFINITIONS */
 
 
@@ -89,11 +91,11 @@ int main (int argc, char *args[]) {
 
             //printf("Current argument: %s\n", args[i]);
             if ( i != 0 ) {
-                printf("current arg: %s\n", args[i]);
+                //printf("current arg: %s\n", args[i]);
                 int curr_arg = atoi(args[i]);
-                printf("integer version: %d\n", curr_arg);
-                availabe_resources[i] = curr_arg;
-                printf("array element %d: %d\n", i, availabe_resources[i]);
+                //printf("integer version: %d\n", curr_arg);
+                available_resources[i] = curr_arg;
+                //printf("array element %d: %d\n", i, availabe_resources[i]);
             }
                 
 
@@ -110,27 +112,36 @@ int main (int argc, char *args[]) {
 
         for (int i = 0; i < NUM_RESOURCES; i++){
             if (i == NUM_RESOURCES - 1)
-                printf(" %d\n", availabe_resources[i]);
+                printf(" %d\n", available_resources[i]);
 
             else    
-                printf(" %d", availabe_resources[i]);
+                printf(" %d", available_resources[i]);
         }
 
         printf("Maximum resources from file:\n");
 
-        for (int i = 0; i < num_customers; i++) {
-           
+        for (int i = 1; i < num_customers + 1; i++) { //realloc adds empty space at the start of the list, so we need to start from second element and go 1 past num_customers to see all of them
+            
+            //printf("outside for loop iteration %d\n", i);
+
             for (int j = 0; j < NUM_RESOURCES; j++) {
 
-                if (j == NUM_RESOURCES - 1) {
+                //if (customers[i].id != NULL) {
+                     if (j == NUM_RESOURCES - 1) {
                     printf(" %d\n", customers[i].maximum[j]);
                 }
 
-                // else if (j == 0)
-                //     printf("%d ", customers[i].maximum[j]);
+                else if (j == 0) {
+                    
+                    printf("%d: %d", customers[i].id, customers[i].maximum[j]);
+                }
+                    
 
                 else
                     printf(" %d", customers[i].maximum[j]);
+                //}
+
+               
             }
 
         }
@@ -161,11 +172,11 @@ int read_file() {
     
     if (in_file != NULL) {
 
-        incoming_customers = (customer *) malloc(sizeof(customer)); //intial setup so it can take a customer, and will resize to fit more
+        incoming_customers = (customer *) malloc(sizeof(customer) * 5); //intial setup so it can take a customer, and will resize to fit more
         int customer_counter = 1; //helps to realloc the size of the pointer list properly
         int k = 0;
         while (fgets(line, BUFFER_SIZE, in_file) != NULL) {
-            char *line_token = fgets(line, BUFFER_SIZE, in_file); //
+            char *line_token = line; //
             //printf("line_token value: %s\n", line_token);
             
             int curr_max[NUM_RESOURCES];
@@ -174,21 +185,49 @@ int read_file() {
             while (char_token != NULL) {
                 
                 curr_max[i] = atoi(char_token);
-                printf("curr_max[i] value: %d\n", curr_max[i]);
+                //printf("curr_max[i] value: %d\n", curr_max[i]);
                 char_token = strtok(NULL, ",");
                 i++;
 
 
             }
 
+            k++;
             num_customers++;
             customer_counter++;
+            printf("calling customer_init with:\n");
+
+            for (int i = 0; i < NUM_RESOURCES; i++) {
+
+                if (i == NUM_RESOURCES - 1) {
+                    printf(" %d\n", curr_max[i]);
+
+                }
+
+                else
+                    printf(" %d", curr_max[i]);
+
+            }
+
             incoming_customers[k] = *customer_init(curr_max);
             customer_counter++;
             incoming_customers = realloc(incoming_customers, sizeof(customer) * customer_counter);
 
         }
+        
+        // for (int i = 0; i < num_customers; i++) {
+        //     printf("%d max resources:", incoming_customers[i].id);
+        //     for (int j = 0; i < NUM_RESOURCES; j++) {
+        //         if (j == NUM_RESOURCES - 1) {
+        //             printf(" %d\n", incoming_customers[i].maximum[j]);
+        //         }
 
+        //         else {
+        //             printf(" %d", incoming_customers[i].maximum[j]);
+        //         }
+        //     }
+
+        // }
 
 
 
@@ -208,9 +247,17 @@ customer *customer_init(int *maximum_resources) {
 
     customer *new_customer = (customer *) malloc(sizeof(customer));
     
-    new_customer->maximum = maximum_resources;
-    new_customer->need = maximum_resources;
+    new_customer->maximum = malloc(NUM_RESOURCES);
+    new_customer->need = malloc(NUM_RESOURCES);
     new_customer->allocated = malloc(NUM_RESOURCES);
+
+    for (int i = 0; i < NUM_RESOURCES; i++) {
+        new_customer->maximum[i] = maximum_resources[i];
+    }
+
+    for (int i = 0; i < NUM_RESOURCES; i++) {
+        new_customer->need[i] = maximum_resources[i];
+    }
     
     for (int i = 0; i < NUM_RESOURCES; i++) {
         new_customer->allocated[i] = 0;
@@ -218,6 +265,8 @@ customer *customer_init(int *maximum_resources) {
 
     new_customer->id = num_customers - 1; //takes the non-updated num_customers so first customer id is zero and so on
 
+
+    //Testing print statements
     printf("%d: Setting max resources to:", new_customer->id);
 
     for (int i = 0; i < NUM_RESOURCES; i++) {
