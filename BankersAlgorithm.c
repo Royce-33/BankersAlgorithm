@@ -318,7 +318,7 @@ int request_resources(customer *customer){
     //fail 
     for (int i = 0; i < 4; i ++){
         if (available_resources[i] - customer_allocated[i] < 0){
-            //failure
+            //failure print statement
         }
         else{
             available_resources[i] = available_resources[i] - customer_allocated[i];
