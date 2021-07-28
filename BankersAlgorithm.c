@@ -50,6 +50,7 @@ typedef struct customer {
     int *allocated;
     int *need;
     int id;
+    bool finished;
 
 } customer;
 
@@ -110,8 +111,8 @@ int main (int argc, char *args[]) {
 
         printf("Currently available resources:");
 
-        for (int i = 0; i < NUM_RESOURCES; i++){
-            if (i == NUM_RESOURCES - 1)
+        for (int i = 1; i < NUM_RESOURCES + 1; i++){
+            if (i == (NUM_RESOURCES + 1) - 1)
                 printf(" %d\n", available_resources[i]);
 
             else    
@@ -195,41 +196,25 @@ int read_file() {
             k++;
             num_customers++;
             customer_counter++;
-            printf("calling customer_init with:\n");
+            // printf("calling customer_init with:\n");
 
-            for (int i = 0; i < NUM_RESOURCES; i++) {
+            // for (int i = 0; i < NUM_RESOURCES; i++) {
 
-                if (i == NUM_RESOURCES - 1) {
-                    printf(" %d\n", curr_max[i]);
+            //     if (i == NUM_RESOURCES - 1) {
+            //         printf(" %d\n", curr_max[i]);
 
-                }
+            //     }
 
-                else
-                    printf(" %d", curr_max[i]);
+            //     else
+            //         printf(" %d", curr_max[i]);
 
-            }
+            // }
 
             incoming_customers[k] = *customer_init(curr_max);
             customer_counter++;
             incoming_customers = realloc(incoming_customers, sizeof(customer) * customer_counter);
 
         }
-        
-        // for (int i = 0; i < num_customers; i++) {
-        //     printf("%d max resources:", incoming_customers[i].id);
-        //     for (int j = 0; i < NUM_RESOURCES; j++) {
-        //         if (j == NUM_RESOURCES - 1) {
-        //             printf(" %d\n", incoming_customers[i].maximum[j]);
-        //         }
-
-        //         else {
-        //             printf(" %d", incoming_customers[i].maximum[j]);
-        //         }
-        //     }
-
-        // }
-
-
 
         customers = incoming_customers;
 
@@ -250,6 +235,7 @@ customer *customer_init(int *maximum_resources) {
     new_customer->maximum = malloc(NUM_RESOURCES);
     new_customer->need = malloc(NUM_RESOURCES);
     new_customer->allocated = malloc(NUM_RESOURCES);
+    new_customer->finished = false;
 
     for (int i = 0; i < NUM_RESOURCES; i++) {
         new_customer->maximum[i] = maximum_resources[i];
@@ -267,37 +253,37 @@ customer *customer_init(int *maximum_resources) {
 
 
     //Testing print statements
-    printf("%d: Setting max resources to:", new_customer->id);
+    // printf("%d: Setting max resources to:", new_customer->id);
 
-    for (int i = 0; i < NUM_RESOURCES; i++) {
+    // for (int i = 0; i < NUM_RESOURCES; i++) {
 
-        if (i == NUM_RESOURCES - 1) {
-            printf(" %d\n", new_customer->maximum[i]);
-        }
-        else
-            printf(" %d", new_customer->maximum[i]);
-    }
+    //     if (i == NUM_RESOURCES - 1) {
+    //         printf(" %d\n", new_customer->maximum[i]);
+    //     }
+    //     else
+    //         printf(" %d", new_customer->maximum[i]);
+    // }
 
-    printf("%d: Setting needed resources to:", new_customer->id);
+    // printf("%d: Setting needed resources to:", new_customer->id);
 
-    for (int i = 0; i < NUM_RESOURCES; i++) {
+    // for (int i = 0; i < NUM_RESOURCES; i++) {
 
-        if (i == NUM_RESOURCES - 1) {
-            printf(" %d\n", new_customer->need[i]);
-        }
-        else
-            printf(" %d", new_customer->need[i]);
-    }
-    printf("%d: Setting allocated resources to:", new_customer->id);
+    //     if (i == NUM_RESOURCES - 1) {
+    //         printf(" %d\n", new_customer->need[i]);
+    //     }
+    //     else
+    //         printf(" %d", new_customer->need[i]);
+    // }
+    // printf("%d: Setting allocated resources to:", new_customer->id);
 
-    for (int i = 0; i < NUM_RESOURCES; i++) {
+    // for (int i = 0; i < NUM_RESOURCES; i++) {
 
-        if (i == NUM_RESOURCES - 1) {
-            printf(" %d\n", new_customer->allocated[i]);
-        }
-        else
-            printf(" %d", new_customer->allocated[i]);
-    }
+    //     if (i == NUM_RESOURCES - 1) {
+    //         printf(" %d\n", new_customer->allocated[i]);
+    //     }
+    //     else
+    //         printf(" %d", new_customer->allocated[i]);
+    // }
 
     return new_customer;
 
