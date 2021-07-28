@@ -28,7 +28,7 @@ Version  2021-06-18
  *    Commands are as follows:
  *      * "RQ" -> requests resources and fills the allocation array, remember that a customer cannot request anything more than its maximum
  *      * "RL" -> releases resources entered from the the given customer 
- *      * "*" -> Display the current state of available, maximum, allocation, and need arrays
+ *      * "Status" -> Display the current state of available, maximum, allocation, and need arrays
  *      * "Run" -> Executes the safe sequence based on the current state and all the threads run the same function code and prints (see assign page for example output)
  */
 
@@ -60,7 +60,7 @@ int read_file();
 customer *customer_init(int *maximum_resources);
 int request_resources(customer *customer);
 int release_resources(customer customer);
-
+int command_handler();
 
 
 
@@ -148,10 +148,14 @@ int main (int argc, char *args[]) {
         }
 
 
+
+
+
+
     }
 
 
-    request_resources(&customers[0]);
+    command_handler();
 
 
     return 0;
@@ -332,6 +336,30 @@ int request_resources(customer *customer){
 
     
 
+
+
+
+}
+
+
+
+
+
+
+/**
+ * Function used to handle user inputted commands once customer object setup is complete
+ */
+int command_handler() {
+
+    char input[BUFFER_SIZE];
+
+    printf("Enter a command:");
+    fgets(input);
+    
+    
+    //scanf("%s", input);
+
+    printf("Command Entered: %s\n", input);
 
 
 
