@@ -65,10 +65,10 @@ int release_resources(customer customer);
 
 
 int num_customers = 0;
-int availabe_resources[32];
+int available_resources[32];
 customer *customers = NULL; //pointer to a list of customers
 
-customer *incoming_customers = NULL; //works similairly to the global list, collects each customer as it comes in
+
 
 /* END DEFINITIONS */
 
@@ -94,7 +94,7 @@ int main (int argc, char *args[]) {
                 //printf("current arg: %s\n", args[i]);
                 int curr_arg = atoi(args[i]);
                 //printf("integer version: %d\n", curr_arg);
-                availabe_resources[i] = curr_arg;
+                available_resources[i] = curr_arg;
                 //printf("array element %d: %d\n", i, availabe_resources[i]);
             }
                 
@@ -112,15 +112,15 @@ int main (int argc, char *args[]) {
 
         for (int i = 0; i < NUM_RESOURCES; i++){
             if (i == NUM_RESOURCES - 1)
-                printf(" %d\n", availabe_resources[i]);
+                printf(" %d\n", available_resources[i]);
 
             else    
-                printf(" %d", availabe_resources[i]);
+                printf(" %d", available_resources[i]);
         }
 
         printf("Maximum resources from file:\n");
 
-        for (int i = 1; i < num_customers; i++) {
+        for (int i = 1; i < num_customers + 1; i++) { //realloc adds empty space at the start of the list, so we need to start from second element and go 1 past num_customers to see all of them
             
             //printf("outside for loop iteration %d\n", i);
 
@@ -128,17 +128,17 @@ int main (int argc, char *args[]) {
 
                 //if (customers[i].id != NULL) {
                      if (j == NUM_RESOURCES - 1) {
-                    printf(" %ls\n", incoming_customers[i].maximum);
+                    printf(" %d\n", customers[i].maximum[j]);
                 }
 
                 else if (j == 0) {
                     
-                    printf("%d: %ls", incoming_customers[i].id, incoming_customers[i].maximum);
+                    printf("%d: %d", customers[i].id, customers[i].maximum[j]);
                 }
                     
 
                 else
-                    printf(" %ls", incoming_customers[i].maximum);
+                    printf(" %d", customers[i].maximum[j]);
                 //}
 
                
@@ -167,7 +167,7 @@ int read_file() {
     char line[BUFFER_SIZE];
     
     
-    
+    customer *incoming_customers = NULL; //works similairly to the global list, collects each customer as it comes in
 
     
     if (in_file != NULL) {
