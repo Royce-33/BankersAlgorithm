@@ -58,7 +58,7 @@ typedef struct customer {
 int main(int argc, char *args[]);
 int read_file();
 customer *customer_init(int *maximum_resources);
-int request_resources(customer *customer);
+int request_resources(customer *customer, int *requested_resources);
 int release_resources(customer customer);
 int command_handler();
 
@@ -296,7 +296,7 @@ customer *customer_init(int *maximum_resources) {
 /**
  * Function used to request resources from the banker
  */
-int request_resources(customer *customer){
+int request_resources(customer *customer, int *request_resources){
 
     int *customer_max = customer->maximum;// read file 
     int *customer_need = customer->need; //customer_max - customer_allocated
@@ -351,16 +351,48 @@ int request_resources(customer *customer){
  */
 int command_handler() {
 
-    char input[BUFFER_SIZE];
+    char command_line[BUFFER_SIZE];
 
-    printf("Enter a command:");
-    fgets(input);
+    printf("Enter a command: ");
+    fgets(command_line, BUFFER_SIZE, stdin); //gets the inputted command 
+
+    char *input = strtok(command_line, "\r\n"); //remove the newline character so we can compare strings properly
     
-    
-    //scanf("%s", input);
+    //printf("results of strncmp against %s and quit: %d\n", command, strncmp(command, "quit", BUFFER_SIZE));
 
-    printf("Command Entered: %s\n", input);
+    while (strcmp(input, "Exit") != 0) {
+
+        char *command = strtok(input, " ");
+
+        //if the first set of characters is RQ, then get the requested resources and send them to a thread that calls request_resources
+        if (strcmp(command, "RQ") == 0) {
+
+            int request[NUM_RESOURCES];
+            int i = 0;
+            command = strtok(NULL, " ");
+            int customer_id = atoi(command);
+            while(command != NULL) {
+                
+                command = strtok(NULL, " ");
+                request[i] = atoi(command);
+                printf("value of request[i]: %d\n", request[i]);
+                i++;
+            }
+            
+
+        }
 
 
+        //if the first set of characters is RL, then get the released resources and send them to a thread that calls release_resources
+
+        //if the first set of characters is Run, then create a thread that calls the safety algorithm
+
+        //if the first set of characters is Status, then create a thread that calls the display_status function
+
+
+
+    }
+
+    printf(">>> Program Terminated.\n");
 
 }
