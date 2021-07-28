@@ -65,7 +65,7 @@ int release_resources(customer customer);
 
 
 int num_customers = 0;
-int availabe_resources[32];
+int available_resources[32];
 customer *customers = NULL; //pointer to a list of customers
 
 /* END DEFINITIONS */
@@ -259,11 +259,23 @@ customer *customer_init(int *maximum_resources) {
  */
 int request_resources(customer *customer){
 
-    int *customer_max = customer->maximum;
-    int *customer_need = customer->need;
-    int *customer_allocated = customer->allocated;
+    int *customer_max = customer->maximum;// read file 
+    int *customer_need = customer->need; //customer_max - customer_allocated
+    int *customer_allocated = customer->allocated;// user input -> RQ 11111
     int customer_id = customer->id;
-
+    // available resources (original) = user input -> Currently Available resources:10 5 7 8
+    //remaining resourcesa = available resources [i] - allocated resources[i]
+    
+    //fail 
+    for (int i = 0; i < 4; i ++){
+        if (available_resources[i] - customer_allocated[i] < 0){
+            //failure
+        }
+        else{
+            available_resources[i] = available_resources[i] - customer_allocated[i];
+            customer_need[i] = customer_max[i] - customer_allocated[i];
+        }
+    }
 
 
 
