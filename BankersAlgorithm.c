@@ -61,6 +61,7 @@ int read_file();
 customer *customer_init(int *maximum_resources);
 void *request_resources(customer *customer, int *requested_resources);
 void *release_resources(customer *customer, int *release_request);
+void *print_status();
 int command_handler();
 
 
@@ -427,6 +428,98 @@ void *release_resources(customer *customer, int *release_request) {
 
 
 }
+/**
+ * Function that prints the current status of the system
+ */
+void *print_status() {
+
+    //prints Available resources
+    printf("Available Resources:\n");
+    for (int i = 1; i < NUM_RESOURCES + 1; i++) {
+
+        if (i == 1) {
+            printf("%d", available_resources[i]);
+        }
+
+        else if (i == (NUM_RESOURCES + 1) - 1) {
+            printf(" %d\n", available_resources[i]);
+        }
+
+        else {
+            printf(" %d", available_resources[i]);
+        }
+
+    }
+
+    //prints Maximum resources
+    printf("Maximum Resources:\n");
+    for (int i = 1; i < num_customers + 1; i++) { //need it starting at 1 and going over num_customers by one because empty space from realloc is at the start of the list
+
+        for (int j = 0; j < NUM_RESOURCES; j++) {
+
+            if (j == 0) {
+                printf("%d: %d", customers[i].id, customers[i].maximum[j]);
+            }
+
+            else if (j == NUM_RESOURCES - 1) {
+                printf(" %d\n", customers[i].maximum[j]);
+            }
+
+            else {
+                printf(" %d", customers[i].maximum[j]);
+            }
+
+        }
+
+    }
+
+    //prints Allocated resources
+    printf("Allocated Resources:\n");
+    for (int i = 1; i < num_customers + 1; i++) {
+
+        for (int j = 0; j < NUM_RESOURCES; j++) {
+
+            if (j == 0) {
+                printf("%d: %d", customers[i].id, customers[i].allocated[j]);
+            }
+
+            else if (j == NUM_RESOURCES - 1) {
+                printf(" %d\n", customers[i].allocated[j]);
+            }
+
+            else {
+                printf(" %d", customers[i].allocated[j]);
+            }
+
+        }
+    }
+
+    //prints Needed resources
+    printf("Needed Resources:\n");
+    for (int i = 1; i < num_customers + 1; i++) {
+
+        for (int j = 0; j < NUM_RESOURCES; j++) {
+
+            if (j == 0) {
+                printf("%d: %d", customers[i].id, customers[i].need[j]);
+            }
+
+            else if (j == NUM_RESOURCES - 1) {
+                printf(" %d\n", customers[i].need[j]);
+            }
+
+            else {
+                printf(" %d", customers[i].need[j]);
+            }
+        }
+
+    }
+
+    command_handler();
+    pthread_exit(0);
+    
+    return 0;
+}
 
 
 /**
@@ -481,6 +574,7 @@ int command_handler() {
 
             if (status != 0) {
                 printf("Error creating thread attributes for request command!\n");
+                exit(-1);
             }
             //printf("Thread attributes created\n");
 
@@ -493,6 +587,7 @@ int command_handler() {
             
             if (status != 0) {
                 printf("Error creating thread for request command!\n");
+                exit(-1);
 
             }
 
@@ -534,13 +629,15 @@ int command_handler() {
             status = pthread_attr_init(&thread_attributes);
 
             if (status != 0) {
-                printf("Error creating thread attributes for request command!\n");
+                printf("Error creating thread attributes for release command!\n");
+                exit(-1);
             }
 
             status = pthread_create(&thread_id, &thread_attributes, release_resources(requesting_customer, request), (requesting_customer, request));
 
             if (status != 0) {
-                printf("Error creating thread for request command!\n");
+                printf("Error creating thread for release command!\n");
+                exit(-1);
 
             }
 
@@ -554,89 +651,26 @@ int command_handler() {
 
         else if (strcmp(command, "Status") == 0) {
 
-            //prints Available resources
-            printf("Available Resources:\n");
-            for (int i = 1; i < NUM_RESOURCES + 1; i++) {
+            pthread_t thread_id;
+            pthread_attr_t thread_attributes;
+            int status;
 
-                if (i == 1) {
-                    printf("%d", available_resources[i]);
-                }
+            status = pthread_attr_init(&thread_attributes);
 
-                else if (i == (NUM_RESOURCES + 1) - 1) {
-                    printf(" %d\n", available_resources[i]);
-                }
-
-                else {
-                    printf(" %d", available_resources[i]);
-                }
-
+            if (status != 0) {
+                printf("Error creating thread attributes for status command!\n");
+                exit(-1);
             }
 
-            //prints Maximum resources
-            printf("Maximum Resources:\n");
-            for (int i = 1; i < num_customers + 1; i++) { //need it starting at 1 and going over num_customers by one because empty space from realloc is at the start of the list
+            status = pthread_create(&thread_id, &thread_attributes, print_status, NULL);
 
-                for (int j = 0; j < NUM_RESOURCES; j++) {
-
-                    if (j == 0) {
-                        printf("%d: %d", customers[i].id, customers[i].maximum[j]);
-                    }
-
-                    else if (j == NUM_RESOURCES - 1) {
-                        printf(" %d\n", customers[i].maximum[j]);
-                    }
-
-                    else {
-                        printf(" %d", customers[i].maximum[j]);
-                    }
-
-                }
-
+            if (status != 0) {
+                printf("Error creating thread for status command!\n");
+                exit(-1);
             }
 
-            //prints Allocated resources
-            printf("Allocated Resources:\n");
-            for (int i = 1; i < num_customers + 1; i++) {
+            pthread_join(thread_id, NULL);
 
-                for (int j = 0; j < NUM_RESOURCES; j++) {
-
-                    if (j == 0) {
-                        printf("%d: %d", customers[i].id, customers[i].allocated[j]);
-                    }
-
-                    else if (j == NUM_RESOURCES - 1) {
-                        printf(" %d\n", customers[i].allocated[j]);
-                    }
-
-                    else {
-                        printf(" %d", customers[i].allocated[j]);
-                    }
-
-                }
-            }
-
-            //prints Needed resources
-            printf("Needed Resources:\n");
-            for (int i = 1; i < num_customers + 1; i++) {
-
-                for (int j = 0; j < NUM_RESOURCES; j++) {
-
-                    if (j == 0) {
-                        printf("%d: %d", customers[i].id, customers[i].need[j]);
-                    }
-
-                    else if (j == NUM_RESOURCES - 1) {
-                        printf(" %d\n", customers[i].need[j]);
-                    }
-
-                    else {
-                        printf(" %d", customers[i].need[j]);
-                    }
-                }
-
-            }
-
-            command_handler();
 
         }
 
