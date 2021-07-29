@@ -60,7 +60,7 @@ int main(int argc, char *args[]);
 int read_file();
 customer *customer_init(int *maximum_resources);
 void *request_resources(customer *customer, int *requested_resources);
-int release_resources(customer customer);
+void *release_resources(customer *customer, int *request_resources);
 int command_handler();
 
 
