@@ -314,8 +314,8 @@ void *request_resources(customer *customer, int *request_resources){
     // }
 
 
-    bool safe = true;
-    bool have_max = true; 
+    bool safe = true; //assures the requested resources is less than or equal to the available resources
+    bool have_max = true; //assures customer has not exceed their max
     for (int i = 0; i < NUM_RESOURCES; i++) { //checking each type of resource to make sure it can be safely allocated
 
         //printf("%dth value of available resources: %d\n", i, available_resources[i]);
