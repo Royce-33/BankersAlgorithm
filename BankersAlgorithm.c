@@ -62,6 +62,10 @@ customer *customer_init(int *maximum_resources);
 void *request_resources(customer *customer, int *requested_resources);
 void *release_resources(customer *customer, int *release_request);
 void *print_status();
+void *run_safety_algorithm();
+void *request_resources_safety(customer *customer, int *request_resources);
+void *release_resources_safety(customer *customer, int *release_request);
+void *thread_run();
 int command_handler();
 
 
@@ -520,7 +524,338 @@ void *print_status() {
     
     return 0;
 }
+/**
+ * Function that takes the system in its current state and searches for safe sequence
+ */
+void *run_safety_algorithm() { //in current state it requests and releases resources properly, but gets stuck in a loop on the first thread because after the first call to request and release they are not safe
 
+    bool no_sequence = false;
+    bool done = false;
+    int safe_sequence[num_customers];
+    int counter = 0; //keeps track of the next open position in safe_sequence
+    int run_counter = 0; //keeps track of how many passes the safety algorithm has made
+    int k = 1;
+
+    while (!(no_sequence) || done) { //while we have not finished checking all customers or there is no safe sequence
+
+        for (k < num_customers + 1; k++;) { //starts at one so we dont try to use the empty space
+
+            if (customers[k].finished == false) { //if the current customer has not been given its needed resources
+
+                bool not_safe = false;
+
+                for (int j = 0; j < NUM_RESOURCES; j++) {
+
+                    if (customers[k].need[j] > available_resources[j+1]) { //j+1 so we don't get test against the zero at the start
+                        not_safe = true;
+                    }
+
+                }
+
+                if (not_safe == false) {
+
+                    //printing info for current thread
+                    printf(">>> Customer/Thread %d\n", customers[k].id);
+                    
+                    printf("Allocated Resources: ");
+                    for (int j = 0; j < NUM_RESOURCES; j++) {
+
+                        if (j == 0) {
+                            printf("%d", customers[k].allocated[j]);
+                        }
+
+                        else if (j == NUM_RESOURCES - 1) {
+                            printf(" %d\n", customers[k].allocated[j]);
+                        }
+
+                        else {
+                            printf(" %d", customers[k].allocated[j]);
+                        }
+                    }
+
+                    printf("Needed: ");
+                    for (int j = 0; j < NUM_RESOURCES; j++) {
+
+                        if (j == 0) {
+                            printf("%d", customers[k].need[j]);
+                        }
+
+                        else if (j == NUM_RESOURCES - 1) {
+                            printf(" %d\n", customers[k].need[j]);
+                        }
+
+                        else {
+                            printf(" %d", customers[k].need[j]);
+                        }
+                    }
+
+                    printf("Available: ");
+                    for (int j = 0; j < NUM_RESOURCES; j++) {
+
+                        if (j == 0) {
+                            printf("%d", available_resources[j+1]);
+                        }
+
+                        else if (j == NUM_RESOURCES - 1) {
+                            printf(" %d\n", available_resources[j+1]);
+                        }
+
+                        else {
+                            printf(" %d", available_resources[j+1]);
+                        }
+                    }
+
+                    //call request resources for the full amount
+                    request_resources_safety(&customers[k], customers[k].need);
+
+                    //create and run thread now that it has its resources
+                    pthread_t thread;
+                    pthread_attr_t thread_attr;
+                    int status;
+
+                    status = pthread_attr_init(&thread_attr);
+
+                    if (status != 0) {
+                        printf("Error while creating thread attributes object for execution!\n");
+                        exit(-1);
+                    }
+
+                    status = pthread_create(&thread, &thread_attr, thread_run, NULL);
+
+                    if (status != 0) {
+                        printf("Error while creating thread for execution!\n");
+                        exit(-1);
+                    }
+
+                    //then call release resources for full amount
+                    release_resources_safety(&customers[k], customers[k].allocated);
+                    
+                    //print new available
+                    printf("New Available: ");
+                    for (int j = 0; j < NUM_RESOURCES; j++) {
+
+                        if (j == 0) {
+                            printf("%d", available_resources[j+1]);
+                        }
+
+                        else if (j == NUM_RESOURCES - 1) {
+                            printf(" %d\n", available_resources[j+1]);
+                        }
+
+                        else {
+                            printf(" %d", available_resources[j+1]);
+                        }
+                    }
+
+                    //finally add the customer_id to safe sequence at position indicated by counter
+                    safe_sequence[counter] = customers[k].id;
+                    counter++;
+                    customers[k].finished = true;
+
+
+                }
+
+
+            }
+
+           
+
+        }
+
+        bool check_done = true;
+        for (int i = 1; i < num_customers + 1; i++) {
+
+            if (customers[i].finished == false) {
+
+                check_done = false;
+            }
+
+        }
+
+        if (run_counter > 2) {
+
+            bool check_no_sequence = false;
+            for (int i = 0; i < num_customers + 1; i++) {
+
+                if (customers[i].finished == false) {
+
+                    check_no_sequence = true;
+                }
+            }
+
+            if (check_no_sequence == true) {
+                no_sequence = true;
+            }
+
+        }
+
+        if (check_done == true) {
+            done = true;
+        }
+
+        
+
+
+
+
+        run_counter++;
+    }
+
+    if (done == true) { //if the sequence is found print safe sequence
+
+        printf("Safe Sequence is: ");
+        for (int i = 0; i < num_customers; i++) {
+
+            if (i == 0) {
+                printf("%d ", safe_sequence[i]);
+            }
+
+            else if (i == NUM_RESOURCES - 1) {
+                printf(" %d\n", safe_sequence[i]);
+            }
+
+            else {
+                printf(" %d", safe_sequence[i]);
+            }
+
+        }
+    }
+
+    else {
+        printf("No possible safe sequence!\n");
+    }
+
+
+    command_handler();
+    pthread_exit(0);
+
+
+    return 0;
+
+}
+
+void *request_resources_safety(customer *customer, int *request_resources) {
+
+    int *customer_max = customer->maximum;// read file 
+    int *customer_need = customer->need; //customer_max - customer_allocated
+    int *customer_allocated = customer->allocated;// user input -> RQ 11111
+    int customer_id = customer->id;
+
+    bool safe = true; //assures the requested resources is less than or equal to the available resources
+    bool have_max = true; //assures customer has not exceed their max
+    for (int i = 0; i < NUM_RESOURCES; i++) { //checking each type of resource to make sure it can be safely allocated
+
+        if (request_resources[i] > available_resources[i+1]) { //available needs to be +1 because of weird behaviour when available is being set
+            //request is bigger than available
+            //printf("%d: comparing requested: %d and available: %d set safe to false\n", i, request_resources[i], available_resources[i]);
+            safe = false;
+        }
+
+        //printf("current value of customer allocated: %d\n", customer_allocated[i]);
+        //printf("current value of customer max: %d\n", customer_max[i]);
+        if (customer_allocated[i] != customer_max[i]) {
+            //requesting customer does not have its max resources
+            have_max = false; 
+        }
+
+    }
+
+    //printf("values of safe:%d\nand have_max:%d\n", safe, have_max);
+
+    if (safe && !(have_max)) { //if the request is safe and the customer does not have its max resources
+
+        //printf("Request is safe, granting resources.\n");
+
+        for (int i = 0; i < NUM_RESOURCES; i++) {
+
+            customer_allocated[i] += request_resources[i];
+            customer_need[i] -= request_resources[i];
+            available_resources[i+1] -= request_resources[i];
+        }
+
+    }
+    else {
+        printf("Request is not safe, resources will not be granted.\n");
+
+    }
+    
+    pthread_exit(0);
+
+    return 0;
+
+}
+
+
+
+void *release_resources_safety(customer *customer, int *release_request) {
+
+    int *customer_max = customer->maximum;// read file 
+    int *customer_need = customer->need; //customer_max - customer_allocated
+    int *customer_allocated = customer->allocated;// user input -> RQ 11111
+    int customer_id = customer->id;
+
+    bool safe = true;//
+    bool have_none = false;
+    for (int i = 0; i < NUM_RESOURCES; i++) { //checking each type of resource to make sure it can be safely allocated
+
+        //printf("%dth value of available resources: %d\n", i, available_resources[i]);
+
+
+        if (release_request[i] > customer_allocated[i]) { //available needs to be +1 because of weird behaviour when available is being set
+            //request is bigger than allocated
+            //printf("%d: comparing requested: %d and available: %d set safe to false\n", i, request_resources[i], available_resources[i]);
+            safe = false;
+        }
+
+        //printf("current value of customer allocated: %d\n", customer_allocated[i]);
+        //printf("current value of customer max: %d\n", customer_max[i]);
+        if ( (release_request[i] != 0) && (customer_allocated[i] == 0) ) { //if we are trying to release a resource that the customer does not have
+            //requesting customer does not have its max resources
+            have_none = true; 
+        }
+
+    }
+
+    //printf("values of safe:%d\nand have_max:%d\n", safe, have_max);
+
+    if (safe && !(have_none)) { //if the request is safe and the customer does not have its max resources
+
+        printf("Thread is releasing resources.\n");
+
+        for (int i = 0; i < NUM_RESOURCES; i++) {
+
+            customer_allocated[i] -= release_request[i];
+            //customer_need[i] -= request_resources[i];
+            available_resources[i+1] += customer_allocated[i];
+        }
+
+    }
+    else {
+        printf("Request is not safe, resources will not be released.\n");
+
+    }
+
+    pthread_exit(0);
+    
+
+    return 0;
+
+}
+
+
+/**
+ * Function used in run_safety_algorithm to run customer thread
+ */
+void *thread_run() {
+
+    printf("Thread has started");
+    sleep(1);
+    printf("Thread has finished");
+
+    pthread_exit(0);
+
+    return 0;
+}
 
 /**
  * Function used to handle user inputted commands once customer object setup is complete
@@ -646,6 +981,28 @@ int command_handler() {
         }
 
         //if the first set of characters is Run, then create a thread that calls the safety algorithm
+        else if (strcmp(command, "Run") == 0) {
+
+            pthread_t thread_id;
+            pthread_attr_t thread_attributes;
+            int status;
+
+            status = pthread_attr_init(&thread_attributes);
+
+            if (status != 0) {
+                printf("Error creating thread attributes for run command!\n");
+                exit(-1);
+            }
+
+            status = pthread_create(&thread_id, &thread_attributes, run_safety_algorithm, NULL);
+
+            if (status != 0) {
+                printf("Error creating thread for run command!\n");
+                exit(-1);
+            }
+
+            pthread_join(thread_id, NULL);
+        }
 
         //if the first set of characters is Status, then create a thread that calls the display_status function
 
