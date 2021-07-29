@@ -23,6 +23,9 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
 * Handles manual resource request and release commands
     * Command structure follows the pattern of:
         * "RQ x x x x ... x" -> where the number of x's is the number of resources
+        * "RL x x x x ... x" -> where the number of x's is the number of resources
+* "Status" command displays maximum, allocated and needed resources for each customer as well as the resources available to all of them
+* "Run" command runs the safe sequence algorithm with the system in its current state 
 
 
 ## Tests
