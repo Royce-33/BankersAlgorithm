@@ -20,6 +20,7 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
 * Implemented release_resources_safety function
 
 ## Features
+* Available resources are inputted by the user via command line
 * Handles manual resource request and release commands
     * Command structure follows the pattern of:
         * "RQ x x x x ... x" -> where the number of x's is the number of resources
@@ -29,7 +30,8 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
 
 
 ## Tests
-
+### Resource Request Test
+![ScreenShot](resources/request_resource_capture.png)
 
 ## Code Example
 
