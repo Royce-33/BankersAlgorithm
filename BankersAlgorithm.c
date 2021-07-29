@@ -652,4 +652,3 @@ int command_handler() {
     exit(0);
 
 }
-

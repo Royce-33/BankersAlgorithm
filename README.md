@@ -10,8 +10,9 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
 ### Riley's Contribution
 * Implemented read_file function
 * Implemented customer_init function
+* Implemented request_resources function
 ### Torin's Contribution
-
+* Implemented release_resources function
 
 ## Features
 
