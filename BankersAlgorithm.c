@@ -350,6 +350,10 @@ void *request_resources(customer *customer, int *request_resources){
         }
 
     }
+    else {
+        printf("Request is not safe, resources will not be granted.\n");
+
+    }
 
 
     //fail 
