@@ -550,3 +550,79 @@ int command_handler() {
     exit(0);
 
 }
+
+void *release_resources(customer *customer, int *request_resources){
+
+    int *customer_max = customer->maximum;// read file 
+    int *customer_need = customer->need; //customer_max - customer_allocated
+    int *customer_allocated = customer->allocated;// user input -> RQ 11111
+    int customer_id = customer->id;
+    // available resources (original) = user input -> Currently Available resources:10 5 7 8
+    //remaining resourcesa = available resources [i] - allocated resources[i]
+    
+    //printf("request resources called with customer id: %d\n", customer->id);
+
+    // for (int i = 0; i < NUM_RESOURCES; i++) {
+
+    //     printf("request resources array element %d value: %d\n", i, request_resources[i]);
+    // }
+
+
+    bool safe = true;
+    bool have_max = true;
+    for (int i = 0; i < NUM_RESOURCES; i++) { //checking each type of resource to make sure it can be safely allocated
+
+        //printf("%dth value of available resources: %d\n", i, available_resources[i]);
+
+
+        if (request_resources[i] > available_resources[i+1]) { //available needs to be +1 because of weird behaviour when available is being set
+            //request is bigger than available
+            //printf("%d: comparing requested: %d and available: %d set safe to false\n", i, request_resources[i], available_resources[i]);
+            safe = false;
+        }
+
+        //printf("current value of customer allocated: %d\n", customer_allocated[i]);
+        //printf("current value of customer max: %d\n", customer_max[i]);
+        if (customer_allocated[i] != customer_max[i]) {
+            //requesting customer does not have its max resources
+            have_max = false; 
+        }
+
+    }
+
+    //printf("values of safe:%d\nand have_max:%d\n", safe, have_max);
+
+    if (safe && !(have_max)) { //if the request is safe and the customer does not have its max resources
+
+        printf("Request is safe, granting resources.\n");
+
+        for (int i = 0; i < NUM_RESOURCES; i++) {
+
+            customer_allocated[i] += request_resources[i];
+            customer_need[i] -= request_resources[i];
+            available_resources[i+1] -= request_resources[i];
+        }
+
+    }
+    else {
+        printf("Request is not safe, resources will not be granted.\n");
+
+    }
+
+
+    //fail 
+    // for (int i = 0; i < 4; i ++){
+    //     if (available_resources[i] - customer_allocated[i] < 0){
+    //         //failure print statement
+    //     }
+    //     else{
+    //         available_resources[i] = available_resources[i] - customer_allocated[i];
+    //         customer_need[i] = customer_max[i] - customer_allocated[i];
+    //     }
+    // }
+    
+
+    return 0;
+
+
+}
