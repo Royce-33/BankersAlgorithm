@@ -12,9 +12,12 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
 * Implemented read_file function
 * Implemented customer_init function
 * Implemented request_resources function
+* Implemented run_safety_algorithm function
 ### Torin's Contribution
 * Implemented main function
 * Implemented release_resources function
+* Implemented request_resources_safety function
+* Implemented release_resources_safety function
 
 ## Features
 
