@@ -297,7 +297,8 @@ customer *customer_init(int *maximum_resources) {
 /**
  * Function used to request resources from the banker
  */
-void *request_resources(customer *customer, int *request_resources){
+void *request_resources(customer *customer, int *request_resources) {
+
 
     int *customer_max = customer->maximum;// read file 
     int *customer_need = customer->need; //customer_max - customer_allocated
@@ -366,7 +367,7 @@ void *request_resources(customer *customer, int *request_resources){
     //         customer_need[i] = customer_max[i] - customer_allocated[i];
     //     }
     // }
-    
+    pthread_exit(0);
 
     return 0;
 
@@ -429,15 +430,23 @@ int command_handler() {
             //printf("Thread attributes created\n");
 
             //In current state, program seg faults at the end of the created thread
-            //status = pthread_create(&thread_id, &thread_attributes, request_resources(requesting_customer, request), (requesting_customer, request));
+            status = pthread_create(&thread_id, &thread_attributes, request_resources(requesting_customer, request), (requesting_customer, request));
             request_resources(requesting_customer, request);
+            printf("After thread creation\n");
+            
+            printf("status value: %d\n", status);
             
             if (status != 0) {
                 printf("Error creating thread for request command!\n");
 
             }
 
-            //pthread_join(thread_id, NULL);
+            printf("Before pthread_join\n");
+            pthread_join(thread_id, NULL);
+            printf("After pthread_join\n");
+            //pthread_exit(0);
+            //pthread_cancel(thread_id);
+            //free(&thread_id);
             
             command_handler();
 
