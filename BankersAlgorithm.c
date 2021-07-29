@@ -528,48 +528,53 @@ void *print_status() {
  * Function that takes the system in its current state and searches for safe sequence
  */
 void *run_safety_algorithm() { //in current state it requests and releases resources properly, but gets stuck in a loop on the first thread because after the first call to request and release they are not safe
+                               //and does not move onto the next customer
 
     bool no_sequence = false;
     bool done = false;
     int safe_sequence[num_customers];
     int counter = 0; //keeps track of the next open position in safe_sequence
     int run_counter = 0; //keeps track of how many passes the safety algorithm has made
-    int k = 1;
 
-    while (!(no_sequence) || done) { //while we have not finished checking all customers or there is no safe sequence
+    while ( (!done) || (!(no_sequence)) ) { //while we have not finished checking all customers or there is no safe sequence
 
-        for (k < num_customers + 1; k++;) { //starts at one so we dont try to use the empty space
+        for (int i = 1; i < num_customers + 1; i++) { //starts at one so we dont try to use the empty space
 
-            if (customers[k].finished == false) { //if the current customer has not been given its needed resources
+            if (customers[i].finished == false) { //if the current customer has not been given its needed resources
 
                 bool not_safe = false;
-
+                bool full = true;
                 for (int j = 0; j < NUM_RESOURCES; j++) {
 
-                    if (customers[k].need[j] > available_resources[j+1]) { //j+1 so we don't get test against the zero at the start
+                    if (customers[i].need[j] > available_resources[j+1]) { //j+1 so we don't get test against the zero at the start
                         not_safe = true;
+                    }
+
+                    else if (customers[i].allocated[j] != customers[i].maximum[j]) {
+                        full = false;
                     }
 
                 }
 
-                if (not_safe == false) {
+
+                if ((not_safe == false) && (full == false)) {
 
                     //printing info for current thread
-                    printf(">>> Customer/Thread %d\n", customers[k].id);
+                    printf(">>> Customer/Thread %d\n", customers[i].id);
                     
                     printf("Allocated Resources: ");
                     for (int j = 0; j < NUM_RESOURCES; j++) {
 
                         if (j == 0) {
-                            printf("%d", customers[k].allocated[j]);
+                            printf("%d", customers[i].allocated[j]);
                         }
 
                         else if (j == NUM_RESOURCES - 1) {
-                            printf(" %d\n", customers[k].allocated[j]);
+                            printf(" %d\n", customers[i].allocated[j]);
                         }
 
                         else {
-                            printf(" %d", customers[k].allocated[j]);
+                            printf(" %d", customers[i].allocated[j]);
                         }
                     }
 
@@ -577,15 +582,15 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
                     for (int j = 0; j < NUM_RESOURCES; j++) {
 
                         if (j == 0) {
-                            printf("%d", customers[k].need[j]);
+                            printf("%d", customers[i].need[j]);
                         }
 
                         else if (j == NUM_RESOURCES - 1) {
-                            printf(" %d\n", customers[k].need[j]);
+                            printf(" %d\n", customers[i].need[j]);
                         }
 
                         else {
-                            printf(" %d", customers[k].need[j]);
+                            printf(" %d", customers[i].need[j]);
                         }
                     }
 
@@ -606,8 +611,9 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
                     }
 
                     //call request resources for the full amount
-                    request_resources_safety(&customers[k], customers[k].need);
-
+                    //printf("Now calling request_resources\n");
+                    request_resources_safety(&customers[i], customers[i].need);
+                    //printf("After request_resources\n");
                     //create and run thread now that it has its resources
                     pthread_t thread;
                     pthread_attr_t thread_attr;
@@ -620,6 +626,7 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
                         exit(-1);
                     }
 
+                    //printf("Before pthread_create\n");
                     status = pthread_create(&thread, &thread_attr, thread_run, NULL);
 
                     if (status != 0) {
@@ -627,8 +634,10 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
                         exit(-1);
                     }
 
+                    pthread_join(thread, NULL);
+
                     //then call release resources for full amount
-                    release_resources_safety(&customers[k], customers[k].allocated);
+                    release_resources_safety(&customers[i], customers[i].allocated);
                     
                     //print new available
                     printf("New Available: ");
@@ -648,9 +657,9 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
                     }
 
                     //finally add the customer_id to safe sequence at position indicated by counter
-                    safe_sequence[counter] = customers[k].id;
+                    safe_sequence[counter] = customers[i].id;
                     counter++;
-                    customers[k].finished = true;
+                    customers[i].finished = true;
 
 
                 }
@@ -689,8 +698,10 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
 
         }
 
+        //printf("Value of check_done: %d\n", check_done);
         if (check_done == true) {
             done = true;
+            //break; //added the break because the while loop does not termina
         }
 
         
@@ -701,16 +712,17 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
         run_counter++;
     }
 
+    //printf("Outside of while loop\n");
     if (done == true) { //if the sequence is found print safe sequence
 
         printf("Safe Sequence is: ");
         for (int i = 0; i < num_customers; i++) {
 
             if (i == 0) {
-                printf("%d ", safe_sequence[i]);
+                printf("%d", safe_sequence[i]);
             }
 
-            else if (i == NUM_RESOURCES - 1) {
+            else if (i == num_customers - 1) {
                 printf(" %d\n", safe_sequence[i]);
             }
 
@@ -768,9 +780,9 @@ void *request_resources_safety(customer *customer, int *request_resources) {
 
         for (int i = 0; i < NUM_RESOURCES; i++) {
 
-            customer_allocated[i] += request_resources[i];
-            customer_need[i] -= request_resources[i];
-            available_resources[i+1] -= request_resources[i];
+            //customer_allocated[i] += request_resources[i];
+            //customer_need[i] -= request_resources[i];
+            //available_resources[i+1] -= request_resources[i];
         }
 
     }
@@ -779,7 +791,7 @@ void *request_resources_safety(customer *customer, int *request_resources) {
 
     }
     
-    pthread_exit(0);
+    //pthread_exit(0);
 
     return 0;
 
@@ -794,7 +806,7 @@ void *release_resources_safety(customer *customer, int *release_request) {
     int *customer_allocated = customer->allocated;// user input -> RQ 11111
     int customer_id = customer->id;
 
-    bool safe = true;//
+    bool safe = true;
     bool have_none = false;
     for (int i = 0; i < NUM_RESOURCES; i++) { //checking each type of resource to make sure it can be safely allocated
 
@@ -823,10 +835,14 @@ void *release_resources_safety(customer *customer, int *release_request) {
         printf("Thread is releasing resources.\n");
 
         for (int i = 0; i < NUM_RESOURCES; i++) {
-
-            customer_allocated[i] -= release_request[i];
-            //customer_need[i] -= request_resources[i];
             available_resources[i+1] += customer_allocated[i];
+            //printf("available resource of type %d is increasing by %d\n", i, customer_allocated[i]);
+            customer_allocated[i] -= release_request[i];
+            customer_need[i] -= release_request[i];
+            //customer_allocated[i] -= customer_allocated[i];
+            
+            
+            
         }
 
     }
@@ -835,7 +851,7 @@ void *release_resources_safety(customer *customer, int *release_request) {
 
     }
 
-    pthread_exit(0);
+    //pthread_exit(0);
     
 
     return 0;
@@ -848,9 +864,9 @@ void *release_resources_safety(customer *customer, int *release_request) {
  */
 void *thread_run() {
 
-    printf("Thread has started");
+    printf("Thread has started\n");
     sleep(1);
-    printf("Thread has finished");
+    printf("Thread has finished\n");
 
     pthread_exit(0);
 
