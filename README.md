@@ -15,6 +15,7 @@ This program requires the following header files to run:
 _*pthread.h is a dynamically linked library, and MUST be linked at **compile time** with the flag "-pthread"_
 ## Screenshots
 * Full Test Case (as defined on the assignment page)
+
 ![ScreenShot](resources/CLI_input_capture.png)
 ![ScreenShot](resources/full_test_case_capture_part1.png)
 ![ScreenShot](resources/full_test_case_capture_part2.png)
