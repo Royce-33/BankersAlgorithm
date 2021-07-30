@@ -11,6 +11,7 @@ This program requires the following header files to run:
 * string.h
 * *pthread.h
 * stdbool.h
+
 _*pthread.h is a dynamically linked library, and MUST be linked at **compile time** with the flag "-pthread"_
 ## Screenshots
 * Full Test Case (as defined on the assignment page)
