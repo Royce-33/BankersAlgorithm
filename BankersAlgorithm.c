@@ -4,12 +4,12 @@ File:   BankersAlgorithm.c           for submission change it to "190416070_1908
 Project: CP386 Assignment 4
 Creates threads in a function and with the main and prints which is active, each runs 5 times
 
-Link to GitHub Repository: 
+Link to GitHub Repository: https://github.com/Royce-33/BankersAlgorithm
 -------------------------------------
 Author:  Riley Adams & Torin Borton-McCallum
 ID:      190416070 & 190824620
 Email:   adam6070@mylaurier.ca & bort4620@mylaurier.ca
-Version  2021-06-18
+Version  2021-07-30
 -------------------------------------
  */
 
@@ -38,7 +38,6 @@ Version  2021-06-18
 #include<string.h>
 #include<pthread.h>
 #include<stdbool.h>
-
 
 /* BEGIN STRUCTURE FUNCTION AND GLOBAL VARIABLE DEFINITION */
 #define NUM_RESOURCES 4 //Change me if you want to change the number resources available
