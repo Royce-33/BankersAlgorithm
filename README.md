@@ -17,7 +17,9 @@ _*pthread.h is a dynamically linked library, and MUST be linked at **compile tim
 * Full Test Case (as defined on the assignment page)
 
 ![ScreenShot](resources/CLI_input_capture.png) <img align="left">
+
 ![ScreenShot](resources/full_test_case_capture_part1.png)
+
 ![ScreenShot](resources/full_test_case_capture_part2.png)
 * Request Resources
 ![ScreenShot](resources/request_resource_capture.png)
