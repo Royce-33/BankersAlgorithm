@@ -55,6 +55,7 @@ _*pthread.h is a dynamically linked library, and MUST be linked at **compile tim
         * "RL x x x ... x" -> where the number of x's is the number of resources
 * "Status" command displays maximum, allocated and needed resources for each customer as well as the resources available to all of them
 * "Run" command runs the safe sequence algorithm with the system in its current state 
+
 _**Note that all command are **case sensitive** and any other input will produce "Command not recognized, please try again!"_
 ## Tests
 ### Resource Request Test
