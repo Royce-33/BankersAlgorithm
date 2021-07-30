@@ -27,7 +27,7 @@ _*pthread.h is a dynamically linked library, and MUST be linked at **compile tim
 ![ScreenShot](resources/request_resource_capture.png)
 * Release Resources
 
-![ScreenShot](resources/release_resources_capture.png)
+![ScreenShot](resources/release_resource_capture.png)
 * Resource Status
 
 ![ScreenShot](resources/resource_status_capture.png)
