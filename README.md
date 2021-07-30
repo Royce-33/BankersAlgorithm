@@ -23,8 +23,8 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
 * Available resources are inputted by the user via command line
 * Handles manual resource request and release commands
     * Command structure follows the pattern of:
-        * "RQ x x x x ... x" -> where the number of x's is the number of resources
-        * "RL x x x x ... x" -> where the number of x's is the number of resources
+        * "RQ x x x ... x" -> where the number of x's is the number of resources
+        * "RL x x x ... x" -> where the number of x's is the number of resources
 * "Status" command displays maximum, allocated and needed resources for each customer as well as the resources available to all of them
 * "Run" command runs the safe sequence algorithm with the system in its current state 
 
@@ -32,7 +32,21 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
 ## Tests
 ### Resource Request Test
 ![ScreenShot](resources/request_resource_capture.png)
-
+* The 0 immediately after the "RQ" is the customer (customer_id) making the request
+* The 4 digits after the customer_id is the number of each resource being requested, seperated by spaces
+### Resource Release Test
+![ScreenShot](resources/release_resource_capture.png)
+* The 0 immediately after the "RL" is the customer (customer_id) making the request
+* The 4 digits after the customer_id is the number of each resource being requested, seperated by spaces
+### Resource Status Test
+![ScreenShot](resources/resource_status_capture.png)
+* The command displays the resources available to all customers, and then the maximum, allocated, and needed resources for each customer
+* Each customers maximum, allocated and needed resources is represented by a row that follows the format: "customer_id: x x x ... x
+### Run Test
+![ScreenShot](resources/run_safety_capture.png)
+* The safety algorithm will run through each thread that can be allocated resources and display its allocated and needed resources, as well as the resources currently available
+* Once every thread has been given the resources it needs, it will display the safe sequence of resource allocation
+* It will otherwise say "No possible safe sequence!" if it cannot allocate resources to ALL customers
 ## Code Example
 
 
