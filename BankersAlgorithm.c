@@ -54,7 +54,6 @@ typedef struct customer {
 
 } customer;
 
-
 int main(int argc, char *args[]);
 int read_file();
 customer *customer_init(int *maximum_resources);
@@ -67,23 +66,12 @@ void *release_resources_safety(customer *customer, int *release_request);
 void *thread_run();
 int command_handler();
 
-
-
-
 int num_customers = 0;
 int available_resources[NUM_RESOURCES];
 customer *customers = NULL; //pointer to a list of customers
-
-
-
 /* END DEFINITIONS */
 
-
-
-
 int main (int argc, char *args[]) {
-
-    //customers = (customer *) malloc(sizeof(customer) * 5);
     
     if (argc < 2) {
 
@@ -132,8 +120,7 @@ int main (int argc, char *args[]) {
 
             for (int j = 0; j < NUM_RESOURCES; j++) {
 
-                //if (customers[i].id != NULL) {
-                     if (j == NUM_RESOURCES - 1) {
+                if (j == NUM_RESOURCES - 1) {
                     printf(" %d\n", customers[i].maximum[j]);
                 }
 
@@ -145,27 +132,16 @@ int main (int argc, char *args[]) {
 
                 else
                     printf(" %d", customers[i].maximum[j]);
-                //}
-
-               
+                
             }
 
         }
-
-
-
-
-
-
     }
-
 
     command_handler();
 
-
     return 0;
 }
-
 
 /**
  * Reads the given input file and passes each line as an array of ints to the customer_init function
@@ -176,10 +152,8 @@ int read_file() {
     
     char line[BUFFER_SIZE];
     
-    
     customer *incoming_customers = NULL; //works similairly to the global list, collects each customer as it comes in
 
-    
     if (in_file != NULL) {
 
         incoming_customers = (customer *) malloc(sizeof(customer) * 5); //intial setup so it can take a customer, and will resize to fit more
@@ -230,7 +204,6 @@ int read_file() {
     }
 
     return 0;
-
 }
                           
 
@@ -259,7 +232,6 @@ customer *customer_init(int *maximum_resources) {
     }
 
     new_customer->id = num_customers - 1; //takes the non-updated num_customers so first customer id is zero and so on
-
 
     //Testing print statements
     // printf("%d: Setting max resources to:", new_customer->id);
@@ -295,7 +267,6 @@ customer *customer_init(int *maximum_resources) {
     // }
 
     return new_customer;
-
 }
 
 /**
@@ -304,12 +275,10 @@ customer *customer_init(int *maximum_resources) {
 void *request_resources(customer *customer, int *request_resources) {
 
 
-    int *customer_max = customer->maximum;// read file 
-    int *customer_need = customer->need; //customer_max - customer_allocated
-    int *customer_allocated = customer->allocated;// user input -> RQ 11111
+    int *customer_max = customer->maximum; 
+    int *customer_need = customer->need; 
+    int *customer_allocated = customer->allocated;
     int customer_id = customer->id;
-    // available resources (original) = user input -> Currently Available resources:10 5 7 8
-    //remaining resourcesa = available resources [i] - allocated resources[i]
     
     //printf("request resources called with customer id: %d\n", customer->id);
 
@@ -318,13 +287,11 @@ void *request_resources(customer *customer, int *request_resources) {
     //     printf("request resources array element %d value: %d\n", i, request_resources[i]);
     // }
 
-
     bool safe = true; //assures the requested resources is less than or equal to the available resources
     bool have_max = true; //assures customer has not exceed their max
     for (int i = 0; i < NUM_RESOURCES; i++) { //checking each type of resource to make sure it can be safely allocated
 
         //printf("%dth value of available resources: %d\n", i, available_resources[i]);
-
 
         if (request_resources[i] > available_resources[i+1]) { //available needs to be +1 because of weird behaviour when available is being set
             //request is bigger than available
@@ -355,6 +322,7 @@ void *request_resources(customer *customer, int *request_resources) {
         }
 
     }
+    
     else {
         printf("Request is not safe, resources will not be granted.\n");
 
@@ -365,28 +333,22 @@ void *request_resources(customer *customer, int *request_resources) {
     pthread_exit(0);
 
     return 0;
-
-
 }
 
 void *release_resources(customer *customer, int *release_request) {
 
-    int *customer_max = customer->maximum;// read file 
-    int *customer_need = customer->need; //customer_max - customer_allocated
-    int *customer_allocated = customer->allocated;// user input -> RQ 11111
+    int *customer_max = customer->maximum; 
+    int *customer_need = customer->need; 
+    int *customer_allocated = customer->allocated;
     int customer_id = customer->id;
-    // available resources (original) = user input -> Currently Available resources:10 5 7 8
-    //remaining resourcesa = available resources [i] - allocated resources[i]
-
-
-    bool safe = true;//
+    
+    bool safe = true;
     bool have_none = false;
     for (int i = 0; i < NUM_RESOURCES; i++) { //checking each type of resource to make sure it can be safely allocated
 
         //printf("%dth value of available resources: %d\n", i, available_resources[i]);
 
-
-        if (release_request[i] > customer_allocated[i]) { //available needs to be +1 because of weird behaviour when available is being set
+        if (release_request[i] > customer_allocated[i]) { 
             //request is bigger than allocated
             //printf("%d: comparing requested: %d and available: %d set safe to false\n", i, request_resources[i], available_resources[i]);
             safe = false;
@@ -415,22 +377,20 @@ void *release_resources(customer *customer, int *release_request) {
         }
 
     }
+    
     else {
         printf("Request is not safe, resources will not be released.\n");
 
     }
-
 
     //thread has finished its job, go back to command handler and exit the thread
     command_handler();
 
     pthread_exit(0);
     
-
     return 0;
-
-
 }
+
 /**
  * Function that prints the current status of the system
  */
@@ -523,6 +483,7 @@ void *print_status() {
     
     return 0;
 }
+
 /**
  * Function that takes the system in its current state and searches for safe sequence
  */
@@ -626,14 +587,14 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
                     }
 
                     //printf("Before pthread_create\n");
-                    status = pthread_create(&thread, &thread_attr, thread_run, NULL);
+                    status = pthread_create(&thread, &thread_attr, thread_run, NULL); //run the current thread through its critical section
 
                     if (status != 0) {
                         printf("Error while creating thread for execution!\n");
                         exit(-1);
                     }
 
-                    pthread_join(thread, NULL);
+                    pthread_join(thread, NULL); //so main thread waits for new one to finish, so that prints are structured properly
 
                     //then call release resources for full amount
                     release_resources_safety(&customers[i], customers[i].allocated);
@@ -660,13 +621,9 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
                     counter++;
                     customers[i].finished = true;
 
-
                 }
 
-
             }
-
-           
 
         }
 
@@ -700,13 +657,8 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
         //printf("Value of check_done: %d\n", check_done);
         if (check_done == true) {
             done = true;
-            //break; //added the break because the while loop does not termina
+            
         }
-
-        
-
-
-
 
         run_counter++;
     }
@@ -736,20 +688,18 @@ void *run_safety_algorithm() { //in current state it requests and releases resou
         printf("No possible safe sequence!\n");
     }
 
-
     command_handler();
+
     pthread_exit(0);
-
-
+    
     return 0;
-
 }
 
 void *request_resources_safety(customer *customer, int *request_resources) {
 
-    int *customer_max = customer->maximum;// read file 
-    int *customer_need = customer->need; //customer_max - customer_allocated
-    int *customer_allocated = customer->allocated;// user input -> RQ 11111
+    int *customer_max = customer->maximum;
+    int *customer_need = customer->need; 
+    int *customer_allocated = customer->allocated;
     int customer_id = customer->id;
 
     bool safe = true; //assures the requested resources is less than or equal to the available resources
@@ -774,35 +724,25 @@ void *request_resources_safety(customer *customer, int *request_resources) {
     //printf("values of safe:%d\nand have_max:%d\n", safe, have_max);
 
     if (safe && !(have_max)) { //if the request is safe and the customer does not have its max resources
+        //nothing happens within the safety_sequence version of this so that the math can be done properly within the release function
 
         //printf("Request is safe, granting resources.\n");
-
-        for (int i = 0; i < NUM_RESOURCES; i++) {
-
-            //customer_allocated[i] += request_resources[i];
-            //customer_need[i] -= request_resources[i];
-            //available_resources[i+1] -= request_resources[i];
-        }
+        
 
     }
     else {
         printf("Request is not safe, resources will not be granted.\n");
-
+        
     }
     
-    //pthread_exit(0);
-
     return 0;
-
 }
-
-
 
 void *release_resources_safety(customer *customer, int *release_request) {
 
-    int *customer_max = customer->maximum;// read file 
-    int *customer_need = customer->need; //customer_max - customer_allocated
-    int *customer_allocated = customer->allocated;// user input -> RQ 11111
+    int *customer_max = customer->maximum;
+    int *customer_need = customer->need; 
+    int *customer_allocated = customer->allocated;
     int customer_id = customer->id;
 
     bool safe = true;
@@ -810,7 +750,6 @@ void *release_resources_safety(customer *customer, int *release_request) {
     for (int i = 0; i < NUM_RESOURCES; i++) { //checking each type of resource to make sure it can be safely allocated
 
         //printf("%dth value of available resources: %d\n", i, available_resources[i]);
-
 
         if (release_request[i] > customer_allocated[i]) { //available needs to be +1 because of weird behaviour when available is being set
             //request is bigger than allocated
@@ -838,25 +777,18 @@ void *release_resources_safety(customer *customer, int *release_request) {
             //printf("available resource of type %d is increasing by %d\n", i, customer_allocated[i]);
             customer_allocated[i] -= release_request[i];
             customer_need[i] -= release_request[i];
-            //customer_allocated[i] -= customer_allocated[i];
-            
-            
-            
+
         }
 
     }
+    
     else {
         printf("Request is not safe, resources will not be released.\n");
 
     }
-
-    //pthread_exit(0);
     
-
     return 0;
-
 }
-
 
 /**
  * Function used in run_safety_algorithm to run customer thread
@@ -926,11 +858,9 @@ int command_handler() {
                 printf("Error creating thread attributes for request command!\n");
                 exit(-1);
             }
+            
             //printf("Thread attributes created\n");
-
-            //In current state, program seg faults at the end of the created thread
             status = pthread_create(&thread_id, &thread_attributes, request_resources(requesting_customer, request), (requesting_customer, request));
-            //request_resources(requesting_customer, request);
             //printf("After thread creation\n");
             
             //printf("status value: %d\n", status);
@@ -1019,8 +949,7 @@ int command_handler() {
             pthread_join(thread_id, NULL);
         }
 
-        //if the first set of characters is Status, then create a thread that calls the display_status function
-
+        //if the first set of characters is Status, then create a thread that calls the print_status function
         else if (strcmp(command, "Status") == 0) {
 
             pthread_t thread_id;
@@ -1056,5 +985,4 @@ int command_handler() {
 
     printf(">>> Program Terminated.\n");
     exit(0);
-
 }
