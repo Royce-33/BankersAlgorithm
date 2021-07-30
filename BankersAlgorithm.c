@@ -37,7 +37,6 @@ Version  2021-06-18
 #include<unistd.h>
 #include<string.h>
 #include<pthread.h>
-#include<semaphore.h>
 #include<stdbool.h>
 
 

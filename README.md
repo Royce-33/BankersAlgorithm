@@ -1,11 +1,30 @@
 # Banker's Algorithm
 Multithreaded code that implements the Banker's Algorithm. Customers request and release resources from the bank, and the banker keeps track of these resources. The banker will grant the request if it satisfies the safety algorithm.
 ## Motivation
-
+Our motivation for implementing this project was to apply operating system concepts learned in class, to help us further understand the foundations that our computers are built upon.
+Obtaining and building upon experience with operating systems other than Windows allows us to get an idea of what professionals in industry have at their disposal to develop cutting-edge software for all consumers.
 ## Installation
-
+This program requires the following header files to run:
+* stdio.h
+* stdlib.h
+* unistd.h
+* string.h
+* *pthread.h
+* stdbool.h
+_*pthread.h is a dynamically linked library, and MUST be linked at **compile time** with the flag "-pthread"_
 ## Screenshots
-
+* Full Test Case (as defined on the assignment page)
+![ScreenShot](resources/CLI_input_capture.png)
+![ScreenShot](resources/full_test_case_capture_part1.png)
+![ScreenShot](resources/full_test_case_capture_part2.png)
+* Request Resources
+![ScreenShot](resources/request_resource_capture.png)
+* Release Resources
+![ScreenShot](resources/release_resources_capture.png)
+* Resource Status
+![ScreenShot](resources/resource_status_capture.png)
+* Run Safety Algorithm
+![ScreenShot](resources/run_safety_capture.png)
 ## Contributions
 ### Riley's Contribution
 * Implemented main function
@@ -27,8 +46,7 @@ Multithreaded code that implements the Banker's Algorithm. Customers request and
         * "RL x x x ... x" -> where the number of x's is the number of resources
 * "Status" command displays maximum, allocated and needed resources for each customer as well as the resources available to all of them
 * "Run" command runs the safe sequence algorithm with the system in its current state 
-
-
+_**Note that all command are **case sensitive** and any other input will produce "Command not recognized, please try again!"_
 ## Tests
 ### Resource Request Test
 ![ScreenShot](resources/request_resource_capture.png)
