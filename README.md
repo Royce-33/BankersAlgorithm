@@ -98,6 +98,7 @@ Torin Borton-McCallum - bort4620@mylaurier.ca
 
 ## Credits
 Dr. Sukhjit Singh Sehra - Professor teaching Operating Systems (CP386)
+
 Wilfrid Laurier University
 
 ## License
