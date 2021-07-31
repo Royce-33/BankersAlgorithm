@@ -39,13 +39,16 @@ _*pthread.h is a dynamically linked library, and MUST be linked at **compile tim
 * Implemented main function
 * Implemented read_file function
 * Implemented customer_init function
+* Implemented print_status function
 * Implemented request_resources function
 * Implemented run_safety_algorithm function
+* Implemented command_handler function
 ### Torin's Contribution
 * Implemented main function
 * Implemented release_resources function
 * Implemented request_resources_safety function
 * Implemented release_resources_safety function
+* Implemented thread_run function
 
 ## Features
 * Available resources are inputted by the user via command line
