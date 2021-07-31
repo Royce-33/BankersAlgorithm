@@ -1,6 +1,6 @@
 /*
 -------------------------------------
-File:   BankersAlgorithm.c           for submission change it to "190416070_190824620_a04.c"
+File:   BankersAlgorithm.c
 Project: CP386 Assignment 4
 Creates threads in a function and with the main and prints which is active, each runs 5 times
 
