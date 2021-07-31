@@ -95,6 +95,7 @@ Run
 Exit
 ```
 
+See Tests section for output behaviour and explanation
 ## Authors
 Riley Adams - adam6070@mylaurier.ca
 
