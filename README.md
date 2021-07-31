@@ -49,6 +49,7 @@ _*pthread.h is a dynamically linked library, and MUST be linked at **compile tim
 
 ## Features
 * Available resources are inputted by the user via command line
+* To change the number of resources you want the algorithm to handle (default is 4), **change NUM_RESOURCES on line 43**
 * Handles manual resource request and release commands
     * Command structure follows the pattern of:
         * "RQ x x x ... x" -> where the number of x's is the number of resources
