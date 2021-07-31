@@ -76,7 +76,20 @@ _**Note that all commands are **case sensitive** and any other input will produc
 * Once every thread has been given the resources it needs, it will display the safe sequence of resource allocation
 * It will otherwise say "No possible safe sequence!" if it cannot allocate resources to ALL customers
 ## Code Example
+To compile and run type in the shell:
+```
+gcc BankersAlgorithm.c -o bankers -ggdb -lrt -pthread
+./bankers x x x ... x
+```
 
+Valid commands:
+```
+RQ x x x ... x
+RL x x x ... x
+Status
+Run
+Exit
+```
 
 ## Authors
 Riley Adams - adam6070@mylaurier.ca
@@ -84,7 +97,8 @@ Riley Adams - adam6070@mylaurier.ca
 Torin Borton-McCallum - bort4620@mylaurier.ca
 
 ## Credits
-
+Dr. Sukhjit Singh Sehra - Professor teaching Operating Systems (CP386)
+Wilfrid Laurier University
 
 ## License
 MIT License -> See the LICENSE file for details.
